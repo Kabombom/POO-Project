@@ -8,8 +8,8 @@ public class Trip {
     private Date date;
 
     //Constructors
-    Trip(){}
-    Trip(int code,String origin,String destiny,double price, double duration, double rating,Date date){
+    public Trip(){}
+    public Trip(int code,String origin,String destiny,double price, double duration, double rating,Date date){
         this.code = code;
         this.origin = origin;
         this.destiny = destiny;
@@ -18,7 +18,7 @@ public class Trip {
         this.rating = rating;
         this.date = date;
     }
-    
+
     //Getters && Setters
     public int getCode() { return code; }
     public void setCode(int code) { this.code = code; }
