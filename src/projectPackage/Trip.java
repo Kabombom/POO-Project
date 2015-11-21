@@ -9,7 +9,7 @@ public class Trip {
 
     //Constructors
     public Trip(){}
-    public Trip(int code,String origin,String destiny,double price, double duration, double rating,Date date){
+    public Trip(int code, String origin, String destiny, double price, double duration, double rating, Date date){
         this.code = code;
         this.origin = origin;
         this.destiny = destiny;
@@ -19,7 +19,7 @@ public class Trip {
         this.date = date;
     }
 
-    //Getters && Setters
+    //Getters and Setters
     public int getCode() { return code; }
     public void setCode(int code) { this.code = code; }
 
@@ -41,5 +41,4 @@ public class Trip {
     public double getDuration() { return duration; }
     public void setDuration(double duration) { this.duration = duration; }
 
-    //
 }
