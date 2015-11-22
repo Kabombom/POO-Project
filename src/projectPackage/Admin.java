@@ -1,16 +1,20 @@
 package projectPackage;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 //TODO test
+//TODO seguranças
 //verificar o metodo de criaçao de uma data para a viagem. Meter varios inputs ou fazer assim?
 //Ao alterar tudo da trip altera se o rating?
 
 public class Admin extends User {
-    public Admin(String name, String nif, String address, String email, String phone, String password) {
-        super(name, nif, address, email, phone, password);
+
+    public Admin(String name, String nif, String address, String email, String phone, String password, int type) {
+        super(name, nif, address, email, phone, password, type);
     }
+
     public void createClient(ArrayList<Client> clients) {
         System.out.print("Input client name: ");
         Scanner input = new Scanner(System.in);
@@ -33,15 +37,17 @@ public class Admin extends User {
         System.out.println();
         System.out.println("Premium or Regular?");
         String type = input.nextLine();
+        ArrayList<Reserve> reserves = new ArrayList<>();
         if (type.equals("Premium")){
-            Premium client = new Premium(name,nif, address, email, phone, password);
+            Premium client = new Premium(name,nif, address, email, phone, password, 2, reserves);
             clients.add(client);
         } else {
-            Regular client = new Regular(name,nif, address, email, phone, password);
+            Regular client = new Regular(name,nif, address, email, phone, password, 3, reserves);
             clients.add(client);
         }
-
+        System.out.println("Operation sucefull");
     }
+
     public void deleteClient(ArrayList<Client> clients) {
         System.out.print("Name of client to delete: ");
         Scanner input = new Scanner(System.in);
@@ -59,37 +65,43 @@ public class Admin extends User {
         }
         System.out.println("Client not found");
     }
+
     public void modifyClient(Client client) {
         String name, nif, address, email, phone, password;
+        int type;
         System.out.println("[0] --> All\n" +
                            "[1] --> Name\n" +
                            "[2] --> NIF\n" +
                            "[3] --> Address\n" +
                            "[4] --> Email\n" +
                            "[5] --> PhoneNumber\n" +
-                           "[6] --> Password\n");
+                           "[6] --> Password\n" +
+                           "[7] --> Type\n");
         System.out.println("Which info of the client do you want to modify: ");
         Scanner input = new Scanner(System.in);
         int choice = input.nextInt();
         switch (choice) {
             case 0:
-                System.out.print("Input new name: ");
+                System.out.print("Client's new name: ");
                 name = input.nextLine();
                 System.out.println();
-                System.out.print("Input NIF: ");
+                System.out.print("Client's NIF: ");
                 nif = input.nextLine();
                 System.out.println();
-                System.out.print("Input address: ");
+                System.out.print("Client's address: ");
                 address = input.nextLine();
                 System.out.println();
-                System.out.print("Input email: ");
+                System.out.print("Client's email: ");
                 email = input.nextLine();
                 System.out.println();
-                System.out.print("Input phone number:");
+                System.out.print("Client's phone number:");
                 phone = input.nextLine();
                 System.out.println();
-                System.out.print("Input password: ");
+                System.out.print("Client's password: ");
                 password = input.nextLine();
+                System.out.println();
+                System.out.print("Client's type: ");
+                type = input.nextInt();
                 System.out.println();
                 client.setName(name);
                 client.setNif(nif);
@@ -97,91 +109,102 @@ public class Admin extends User {
                 client.setEmail(email);
                 client.setPhone(phone);
                 client.setPassword(password);
+                client.setType(type);
                 return;
             case 1:
-                System.out.print("Input new name: ");
+                System.out.print("Client's new name: ");
                 name = input.nextLine();
                 System.out.println();
                 client.setName(name);
                 return;
             case 2:
-                System.out.print("Input new NIF: ");
+                System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
                 System.out.println();
                 client.setNif(nif);
                 return;
             case 3:
-                System.out.print("Input new address: ");
+                System.out.print("Client's new address: ");
                 address = input.nextLine();
                 client.setAddress(address);
                 return;
             case 4:
-                System.out.print("Input new email: ");
+                System.out.print("Client's new email: ");
                 email = input.nextLine();
                 System.out.println();
                 client.setEmail(email);
                 return;
             case 5:
-                System.out.print("Input new phone number:");
+                System.out.print("Client's new phone number:");
                 phone = input.nextLine();
                 System.out.println();
                 client.setPhone(phone);
                 return;
             case 6:
-                System.out.print("Input new password: ");
+                System.out.print("Client's new password: ");
                 password = input.nextLine();
                 System.out.println();
                 client.setPassword(password);
                 return;
+            case 7:
+                System.out.print("Client's type: ");
+                type = input.nextInt();
+                System.out.println();
+                client.setType(type);
+                return;
             default:
                 System.out.println("Invalid Operation");
-
         }
+        System.out.println("Operation sucefull");
     }
+
     public void listClients(ArrayList<Client> clients) {
         for (Client client : clients) {
             System.out.println(client);
         }
     }
+
     public void createTrip(ArrayList<Trip> trips) {
-        System.out.print("Input trip code: ");
+        System.out.print("Trip code: ");
         Scanner input = new Scanner(System.in);
         int code = input.nextInt();
         System.out.println();
-        System.out.print("Input trip origin: ");
+        System.out.print("Trip origin: ");
         String origin = input.nextLine();
         System.out.println();
-        System.out.print("Input trip destiny: ");
+        System.out.print("Trip destiny: ");
         String destiny = input.nextLine();
         System.out.println();
-        System.out.print("Input trip price: ");
+        System.out.print("Trip price: ");
         Double price = input.nextDouble();
         System.out.println();
-        System.out.print("Input trip duration: ");
+        System.out.print("Trip duration: ");
         Double duration = input.nextDouble();
         System.out.println();
-        System.out.print("Input trip rating: ");
+        System.out.print("Trip rating: ");
         Double rating = input.nextDouble();
         System.out.println();
-        System.out.println("Input trip minute: ");
+        System.out.println("Trip minute: ");
         int minute = input.nextInt();
         System.out.println();
-        System.out.println("Input trip hour: ");
+        System.out.println("Trip hour: ");
         int hour = input.nextInt();
         System.out.println();
-        System.out.println("Input trip day: ");
+        System.out.println("Trip day: ");
         int day = input.nextInt();
         System.out.println();
-        System.out.println("Input trip month: ");
+        System.out.println("Trip month: ");
         int month = input.nextInt();
         System.out.println();
-        System.out.println("Input trip year: ");
+        System.out.println("Trip year: ");
         int year = input.nextInt();
         System.out.println();
         Date date = new Date(minute, hour, day, month, year);
         Trip trip = new Trip(code, origin, destiny, price, duration, rating, date);
         trips.add(trip);
+        System.out.println("Operation sucefull");
     }
+
     public void deleteTrip(ArrayList<Trip> trips) {
         System.out.print("Code of Trip to delete: ");
         Scanner input = new Scanner(System.in);
@@ -196,6 +219,7 @@ public class Admin extends User {
         }
         System.out.println("Trip not found");
     }
+
     public void modifyTrip(Trip trip) {
         int code, minute, hour, day, month, year;
         double price, duration, rating;
@@ -213,34 +237,34 @@ public class Admin extends User {
         int choice = input.nextInt();
         switch (choice) {
             case 0:
-                System.out.print("Input new code: ");
+                System.out.print("Trip new code: ");
                 code = input.nextInt();
                 System.out.println();
-                System.out.print("Input new origin: ");
+                System.out.print("Trip new origin: ");
                 origin = input.nextLine();
                 System.out.println();
-                System.out.print("Input new destiny: ");
+                System.out.print("Trip new destiny: ");
                 destiny = input.nextLine();
                 System.out.println();
-                System.out.print("Input new price: ");
+                System.out.print("Trip new price: ");
                 price = input.nextDouble();
                 System.out.println();
-                System.out.print("Input new duration:");
+                System.out.print("Trip new duration:");
                 duration = input.nextDouble();
                 System.out.println();
-                System.out.println("Input new minute: ");
+                System.out.println("Trip new minute: ");
                 minute = input.nextInt();
                 System.out.println();
-                System.out.println("Input new hour: ");
+                System.out.println("Trip new hour: ");
                 hour = input.nextInt();
                 System.out.println();
-                System.out.println("Input new day: ");
+                System.out.println("Trip new day: ");
                 day = input.nextInt();
                 System.out.println();
-                System.out.println("Input new month: ");
+                System.out.println("Trip new month: ");
                 month = input.nextInt();
                 System.out.println();
-                System.out.println("Input new year: ");
+                System.out.println("Trip new year: ");
                 year = input.nextInt();
                 System.out.println();
                 date = new Date(minute, hour, day, month, year);
@@ -252,48 +276,48 @@ public class Admin extends User {
                 trip.setDate(date);
                 return;
             case 1:
-                System.out.print("Input new code: ");
+                System.out.print("Trip new code: ");
                 code = input.nextInt();
                 System.out.println();
                 trip.setCode(code);
                 return;
             case 2:
-                System.out.print("Input new origin: ");
+                System.out.print("Trip new origin: ");
                 origin = input.nextLine();
                 System.out.println();
                 trip.setOrigin(origin);
                 return;
             case 3:
-                System.out.print("Input new destiny: ");
+                System.out.print("Trip new destiny: ");
                 destiny = input.nextLine();
                 trip.setDestiny(destiny);
                 return;
             case 4:
-                System.out.print("Input new price: ");
+                System.out.print("Trip new price: ");
                 price = input.nextDouble();
                 System.out.println();
                 trip.setPrice(price);
                 return;
             case 5:
-                System.out.print("Input new duration:");
+                System.out.print("Trip new duration:");
                 duration = input.nextDouble();
                 System.out.println();
                 trip.setDuration(duration);
                 return;
             case 6:
-                System.out.println("Input new minute: ");
+                System.out.println("Trip new minute: ");
                 minute = input.nextInt();
                 System.out.println();
-                System.out.println("Input new hour: ");
+                System.out.println("Trip new hour: ");
                 hour = input.nextInt();
                 System.out.println();
-                System.out.println("Input new day: ");
+                System.out.println("Trip new day: ");
                 day = input.nextInt();
                 System.out.println();
-                System.out.println("Input new month: ");
+                System.out.println("Trip new month: ");
                 month = input.nextInt();
                 System.out.println();
-                System.out.println("Input new year: ");
+                System.out.println("Trip new year: ");
                 year = input.nextInt();
                 System.out.println();
                 date = new Date(minute, hour, day, month, year);
@@ -301,23 +325,25 @@ public class Admin extends User {
                 return;
             default:
                 System.out.println("Invalid Operation");
+        }
+        System.out.println("Operation sucefull");
+    }
 
-        }
-    }
     public void listTrips(ArrayList<Trip> trips) {
-        for (Trip trip : trips) {
+        for (Trip trip : trips)
             System.out.println(trip);
-        }
     }
+
     public void createBus() {
-        System.out.print("Input bus license plate: ");
+        System.out.print("Bus license plate: ");
         Scanner input = new Scanner(System.in);
         String licensePlate = input.nextLine();
         System.out.println();
-        System.out.print("Input bus capacity: ");
+        System.out.print("Bus capacity: ");
         int capacity = input.nextInt();
         System.out.println();
     }
+
     public void deleteBus(ArrayList<Bus> buses) {
         System.out.print("License Plate of bus to delete: ");
         Scanner input = new Scanner(System.in);
@@ -326,12 +352,13 @@ public class Admin extends User {
         for (int i = 0; i < buses.size(); i++) {
             if (buses.get(i).getLicensePlate().equals(licensePlate)) {
                 buses.remove(i);
-                System.out.println("Trip sucefully removed");
+                System.out.println("Bus sucefully removed");
                 return;
             }
         }
-        System.out.println("Trip not found");
+        System.out.println("Bus not found");
     }
+
     public void modifyBus(Bus bus) {
         String licensePlate;
         int capacity;
@@ -343,23 +370,23 @@ public class Admin extends User {
         int choice = input.nextInt();
         switch (choice) {
             case 0:
-                System.out.print("Input new license plate: ");
+                System.out.print("Bus new license plate: ");
                 licensePlate = input.nextLine();
                 System.out.println();
-                System.out.print("Input capacity: ");
+                System.out.print("Bus new capacity: ");
                 capacity = input.nextInt();
                 System.out.println();
                 bus.setLicensePlate(licensePlate);
                 bus.setCapacity(capacity);
                 return;
             case 1:
-                System.out.print("Input new license plate: ");
+                System.out.print("Bus new license plate: ");
                 licensePlate = input.nextLine();
                 System.out.println();
                 bus.setLicensePlate(licensePlate);
                 return;
             case 2:
-                System.out.print("Input new capacity: ");
+                System.out.print("Bus new capacity: ");
                 capacity = input.nextInt();
                 System.out.println();
                 bus.setCapacity(capacity);
@@ -368,9 +395,9 @@ public class Admin extends User {
                 System.out.println("Invalid Operation");
         }
     }
+
     public void listBuses(ArrayList<Bus> buses) {
-        for (Bus bus: buses) {
+        for (Bus bus: buses)
             System.out.println(bus);
-        }
     }
 }

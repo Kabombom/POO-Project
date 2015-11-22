@@ -7,15 +7,16 @@ public class User {
     private String email;
     private String phone;
     private String password;
+    private int type;
 
-    User() {}
-    public User(String name, String nif, String address, String email, String phone, String password) {
+    public User(String name, String nif, String address, String email, String phone, String password, int type) {
         this.name = name;
         this.nif = nif;
         this.address = address;
         this.email = email;
         this.phone = phone;
         this.password = password;
+        this.type = type;
     }
 
     public String getName() {
@@ -58,6 +59,9 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public int getType() { return type; }
+    public void setType(int type) { this.type = type; }
 
     @Override
     public String toString() {

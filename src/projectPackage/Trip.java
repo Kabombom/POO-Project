@@ -41,4 +41,18 @@ public class Trip {
     public double getDuration() { return duration; }
     public void setDuration(double duration) { this.duration = duration; }
 
+    public void addRating(double rating) { this.rating += rating; }
+
+    @Override
+    public String toString() {
+        return "Trip{" +
+                "code=" + code +
+                ", origin='" + origin + '\'' +
+                ", destiny='" + destiny + '\'' +
+                ", price=" + price +
+                ", duration=" + duration +
+                ", rating=" + rating +
+                ", date=" + date +
+                '}';
+    }
 }

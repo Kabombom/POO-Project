@@ -22,4 +22,12 @@ public class Bus {
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
+
+    @Override
+    public String toString() {
+        return "Bus{" +
+                "licensePlate='" + licensePlate + '\'' +
+                ", capacity=" + capacity +
+                '}';
+    }
 }
