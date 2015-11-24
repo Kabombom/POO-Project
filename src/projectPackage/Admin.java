@@ -1,13 +1,10 @@
 package projectPackage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 //TODO test
 //TODO seguranças
-//verificar o metodo de criaçao de uma data para a viagem. Meter varios inputs ou fazer assim?
-//Ao alterar tudo da trip altera se o rating?
 
 public class Admin extends User {
 
@@ -15,7 +12,8 @@ public class Admin extends User {
         super(name, nif, address, email, phone, password, type);
     }
 
-    public void createClient(ArrayList<Client> clients) {
+    public Client createClient() {
+        Client client;
         System.out.print("Input client name: ");
         Scanner input = new Scanner(System.in);
         String name = input.nextLine();
@@ -39,13 +37,12 @@ public class Admin extends User {
         String type = input.nextLine();
         ArrayList<Reserve> reserves = new ArrayList<>();
         if (type.equals("Premium")){
-            Premium client = new Premium(name,nif, address, email, phone, password, 2, reserves);
-            clients.add(client);
+            client = new Premium(name,nif, address, email, phone, password, 2, reserves);
         } else {
-            Regular client = new Regular(name,nif, address, email, phone, password, 3, reserves);
-            clients.add(client);
+            client = new Regular(name,nif, address, email, phone, password, 3, reserves);
         }
         System.out.println("Operation sucefull");
+        return  client;
     }
 
     public void deleteClient(ArrayList<Client> clients) {
@@ -69,13 +66,13 @@ public class Admin extends User {
     public void modifyClient(Client client) {
         String name, nif, address, email, phone, password;
         int type;
-        System.out.println("[0] --> All\n" +
-                           "[1] --> Name\n" +
-                           "[2] --> NIF\n" +
-                           "[3] --> Address\n" +
-                           "[4] --> Email\n" +
-                           "[5] --> PhoneNumber\n" +
-                           "[6] --> Password\n" +
+        System.out.println("[0] --> All\n"          +
+                           "[1] --> Name\n"         +
+                           "[2] --> NIF\n"          +
+                           "[3] --> Address\n"      +
+                           "[4] --> Email\n"        +
+                           "[5] --> PhoneNumber\n"  +
+                           "[6] --> Password\n"     +
                            "[7] --> Type\n");
         System.out.println("Which info of the client do you want to modify: ");
         Scanner input = new Scanner(System.in);
@@ -164,7 +161,7 @@ public class Admin extends User {
         }
     }
 
-    public void createTrip(ArrayList<Trip> trips) {
+    public Trip createTrip() {
         System.out.print("Trip code: ");
         Scanner input = new Scanner(System.in);
         int code = input.nextInt();
@@ -181,28 +178,33 @@ public class Admin extends User {
         System.out.print("Trip duration: ");
         Double duration = input.nextDouble();
         System.out.println();
-        System.out.print("Trip rating: ");
-        Double rating = input.nextDouble();
-        System.out.println();
-        System.out.println("Trip minute: ");
+        System.out.print("Trip minute: ");
         int minute = input.nextInt();
         System.out.println();
-        System.out.println("Trip hour: ");
+        System.out.print("Trip hour: ");
         int hour = input.nextInt();
         System.out.println();
-        System.out.println("Trip day: ");
+        System.out.print("Trip day: ");
         int day = input.nextInt();
         System.out.println();
-        System.out.println("Trip month: ");
+        System.out.print("Trip month: ");
         int month = input.nextInt();
         System.out.println();
-        System.out.println("Trip year: ");
+        System.out.print("Trip year: ");
         int year = input.nextInt();
         System.out.println();
         Date date = new Date(minute, hour, day, month, year);
-        Trip trip = new Trip(code, origin, destiny, price, duration, rating, date);
-        trips.add(trip);
+        System.out.print("Number of buses used: ");
+        int numBuses = input.nextInt();
+        System.out.println();
+        ArrayList<Bus> buses = new ArrayList<>(numBuses);
+        for (int i = 0; i < numBuses; i++) {
+            buses.add(createBus());
+        }
+        ArrayList<Coment> coments = new ArrayList<>();
+        Trip trip = new Trip(code, origin, destiny, price, duration, date, buses, coments);
         System.out.println("Operation sucefull");
+        return trip;
     }
 
     public void deleteTrip(ArrayList<Trip> trips) {
@@ -220,18 +222,20 @@ public class Admin extends User {
         System.out.println("Trip not found");
     }
 
+    //Permite se alterar tambem os comentarios?
     public void modifyTrip(Trip trip) {
         int code, minute, hour, day, month, year;
-        double price, duration, rating;
+        double price, duration;
         String origin, destiny;
         Date date;
-        System.out.println("[0] --> All\n" +
-                           "[1] --> Code\n" +
-                           "[2] --> Origin\n" +
-                           "[3] --> Destiny\n" +
-                           "[4] --> Price\n" +
+        System.out.println("[0] --> All\n"      +
+                           "[1] --> Code\n"     +
+                           "[2] --> Origin\n"   +
+                           "[3] --> Destiny\n"  +
+                           "[4] --> Price\n"    +
                            "[5] --> Duration\n" +
-                           "[6] --> Date\n");
+                           "[6] --> Date\n"     +
+                           "[7] --> Buses\n");
         System.out.println("Which info of the trip do you want to modify: ");
         Scanner input = new Scanner(System.in);
         int choice = input.nextInt();
@@ -323,6 +327,16 @@ public class Admin extends User {
                 date = new Date(minute, hour, day, month, year);
                 trip.setDate(date);
                 return;
+            case 7:
+                System.out.print("License Plate of bus to modify: ");
+                String licensePlate = input.nextLine();
+                for (Bus bus : trip.getBuses()) {
+                    if (bus.getLicensePlate().equals(licensePlate)) {
+                        modifyBus(bus);
+                        break;
+                    }
+                }
+                return;
             default:
                 System.out.println("Invalid Operation");
         }
@@ -330,11 +344,12 @@ public class Admin extends User {
     }
 
     public void listTrips(ArrayList<Trip> trips) {
-        for (Trip trip : trips)
+        for (Trip trip : trips) {
             System.out.println(trip);
+        }
     }
 
-    public void createBus() {
+    public Bus createBus() {
         System.out.print("Bus license plate: ");
         Scanner input = new Scanner(System.in);
         String licensePlate = input.nextLine();
@@ -342,6 +357,9 @@ public class Admin extends User {
         System.out.print("Bus capacity: ");
         int capacity = input.nextInt();
         System.out.println();
+        boolean[] takenSeats = new boolean[capacity];
+        Bus bus = new Bus(licensePlate, capacity, takenSeats);
+        return bus;
     }
 
     public void deleteBus(ArrayList<Bus> buses) {
@@ -359,12 +377,13 @@ public class Admin extends User {
         System.out.println("Bus not found");
     }
 
+    //Acrescenta a opçao de poder mudar os lugares ocupados?
     public void modifyBus(Bus bus) {
         String licensePlate;
         int capacity;
-        System.out.println("[0] --> All\n" +
+        System.out.println("[0] --> All\n"          +
                            "[1] --> Licese Plate\n" +
-                           "[2] --> Capacity\n");
+                           "[2] --> Capacity");
         System.out.println("Which info of the bus do you want to modify: ");
         Scanner input = new Scanner(System.in);
         int choice = input.nextInt();
@@ -397,7 +416,8 @@ public class Admin extends User {
     }
 
     public void listBuses(ArrayList<Bus> buses) {
-        for (Bus bus: buses)
+        for (Bus bus: buses) {
             System.out.println(bus);
+        }
     }
 }

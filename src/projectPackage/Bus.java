@@ -3,10 +3,12 @@ package projectPackage;
 public class Bus {
     private String licensePlate;
     private int capacity;
+    private boolean[] takenSeats;
 
-    public Bus(String licensePlate, int capacity) {
+    public Bus(String licensePlate, int capacity, boolean[] takenSeats) {
         this.licensePlate = licensePlate;
         this.capacity = capacity;
+        this.takenSeats = takenSeats;
     }
 
     public String getLicensePlate() {
@@ -22,6 +24,9 @@ public class Bus {
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
+
+    public boolean[] getTakenSeats() { return takenSeats; }
+    public void setTakenSeats(int seat) { this.takenSeats[seat] = true; }
 
     @Override
     public String toString() {

@@ -1,15 +1,17 @@
 package projectPackage;
 
+import java.util.ArrayList;
+
+//TODO perguntar ao prof se pode ser assim
+
 public class Reserve {
     private Client  client;
     private Trip trip;
-    private Bus bus;
     private int seatNumber;
 
-    public Reserve(Client client, Trip trip, Bus bus, int seatNumber) {
+    public Reserve(Client client, Trip trip, int seatNumber) {
         this.client = client;
         this.trip = trip;
-        this.bus = bus;
         this.seatNumber = seatNumber;
     }
 
@@ -20,24 +22,18 @@ public class Reserve {
         this.client = client;
     }
 
-    public Trip getTrip() {
-        return trip;
-    }
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
+    public Trip getTrip() { return trip; }
+    public void setTrip(Trip trip) { this.trip = trip; }
 
-    public Bus getBus() {
-        return bus;
-    }
-    public void setBus(Bus bus) {
-        this.bus = bus;
-    }
+    public int getSeatNumber() { return seatNumber; }
+    public void setSeatNumber(int seatNumber) { this.seatNumber = seatNumber; }
 
-    public int getSeatNumber() {
-        return seatNumber;
-    }
-    public void setSeatNumber(int seatNumber) {
-        this.seatNumber = seatNumber;
+    @Override
+    public String toString() {
+        return "Reserve{" +
+                "client=" + client +
+                ", trip=" + trip +
+                ", seatNumber=" + seatNumber +
+                '}';
     }
 }

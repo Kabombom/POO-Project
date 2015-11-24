@@ -3,6 +3,7 @@ package projectPackage;
 import java.util.ArrayList;
 
 public class Regular extends Client{
+
     public Regular(String name, String nif, String address, String email, String phone, String password, int type, ArrayList<Reserve> clientReserves) {
         super(name, nif, address, email, phone, password, type, clientReserves);
     }
@@ -13,7 +14,7 @@ public class Regular extends Client{
     }
 
     @Override
-    public void reserveTrip(ArrayList<Reserve> reserves) {
+    public void reserveTrip(ArrayList<Trip> trips) {
 
     }
 
@@ -23,12 +24,12 @@ public class Regular extends Client{
     }
 
     @Override
-    public void cancelReserve(ArrayList<Reserve> reserves) {
+    public void cancelReserve() {
 
     }
 
     @Override
-    public void addCommentTrip(ArrayList<Coment> coments) {
+    public void addCommentTrip(Trip trip) {
 
     }
 
@@ -37,14 +38,5 @@ public class Regular extends Client{
 
     }
 
-    @Override
-    public void addScore(Trip trip) {
-
-    }
-
-    @Override
-    public void payment() {
-
-    }
 
 }
