@@ -18,7 +18,7 @@ public class Premium extends Client {
                 boolean[] takenSeats = bus.getTakenSeats();
                 boolean toBreakLoop = false;
                 for (boolean takenSeat : takenSeats) {
-                    if (takenSeat) {
+                    if (!takenSeat) {
                         System.out.println(trip);
                         toBreakLoop = true;
                         break;
