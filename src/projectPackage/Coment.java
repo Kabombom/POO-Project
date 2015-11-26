@@ -14,4 +14,12 @@ public class Coment {
 
     public double getScore() { return score; }
     public void setScore(double score) { this.score = score; }
+
+    @Override
+    public String toString() {
+        return "Coment{" +
+                "comment='" + comment + '\'' +
+                ", score=" + score +
+                '}';
+    }
 }

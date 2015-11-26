@@ -2,8 +2,6 @@ package projectPackage;
 
 import java.util.ArrayList;
 
-//TODO perguntar ao prof se pode ser assim
-
 public class Reserve {
     private Client  client;
     private Trip trip;

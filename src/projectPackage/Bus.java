@@ -1,14 +1,16 @@
 package projectPackage;
 
+//TODO MUDAR O construtor por causa do array
+
 public class Bus {
     private String licensePlate;
     private int capacity;
     private boolean[] takenSeats;
 
-    public Bus(String licensePlate, int capacity, boolean[] takenSeats) {
+    public Bus(String licensePlate, int capacity) {
         this.licensePlate = licensePlate;
         this.capacity = capacity;
-        this.takenSeats = takenSeats;
+        this.takenSeats = new boolean[capacity];
     }
 
     public String getLicensePlate() {
@@ -26,7 +28,11 @@ public class Bus {
     }
 
     public boolean[] getTakenSeats() { return takenSeats; }
-    public void setTakenSeats(int seat) { this.takenSeats[seat] = true; }
+
+    public void setTakenSeats(boolean[] takenSeats) { this.takenSeats = takenSeats; }
+
+    public void addTakenSeat(int seat) { this.takenSeats[seat] = true; }
+    public void deleteTakenSeat(int seat) { this.takenSeats[seat] = false; }
 
     @Override
     public String toString() {

@@ -3,7 +3,6 @@ package projectPackage;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO test
 //TODO seguranças
 
 public class Admin extends User {
@@ -14,25 +13,19 @@ public class Admin extends User {
 
     public Client createClient() {
         Client client;
-        System.out.print("Input client name: ");
+        System.out.print("Client name: ");
         Scanner input = new Scanner(System.in);
         String name = input.nextLine();
-        System.out.println();
-        System.out.print("Input client NIF: ");
+        System.out.print("Client NIF: ");
         String nif = input.nextLine();
-        System.out.println();
-        System.out.print("Input client address: ");
+        System.out.print("Client address: ");
         String address = input.nextLine();
-        System.out.println();
-        System.out.print("Input client email: ");
+        System.out.print("Client email: ");
         String email = input.nextLine();
-        System.out.println();
-        System.out.print("Input client phone number:");
+        System.out.print("Client phone number:");
         String phone = input.nextLine();
-        System.out.println();
-        System.out.print("Input client password: ");
+        System.out.print("Client password: ");
         String password = input.nextLine();
-        System.out.println();
         System.out.println("Premium or Regular?");
         String type = input.nextLine();
         ArrayList<Reserve> reserves = new ArrayList<>();
@@ -49,10 +42,8 @@ public class Admin extends User {
         System.out.print("Name of client to delete: ");
         Scanner input = new Scanner(System.in);
         String name = input.nextLine();
-        System.out.println();
         System.out.print("NIF of client to delete: ");
         String nif = input.nextLine();
-        System.out.println();
         for (int i = 0; i < clients.size(); i++) {
             if (clients.get(i).getName().equals(name) && clients.get(i).getNif().equals(nif)) {
                 clients.remove(i);
@@ -81,25 +72,18 @@ public class Admin extends User {
             case 0:
                 System.out.print("Client's new name: ");
                 name = input.nextLine();
-                System.out.println();
                 System.out.print("Client's NIF: ");
                 nif = input.nextLine();
-                System.out.println();
                 System.out.print("Client's address: ");
                 address = input.nextLine();
-                System.out.println();
                 System.out.print("Client's email: ");
                 email = input.nextLine();
-                System.out.println();
                 System.out.print("Client's phone number:");
                 phone = input.nextLine();
-                System.out.println();
                 System.out.print("Client's password: ");
                 password = input.nextLine();
-                System.out.println();
                 System.out.print("Client's type: ");
                 type = input.nextInt();
-                System.out.println();
                 client.setName(name);
                 client.setNif(nif);
                 client.setAddress(address);
@@ -111,13 +95,11 @@ public class Admin extends User {
             case 1:
                 System.out.print("Client's new name: ");
                 name = input.nextLine();
-                System.out.println();
                 client.setName(name);
                 return;
             case 2:
                 System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
-                System.out.println();
                 client.setNif(nif);
                 return;
             case 3:
@@ -128,25 +110,21 @@ public class Admin extends User {
             case 4:
                 System.out.print("Client's new email: ");
                 email = input.nextLine();
-                System.out.println();
                 client.setEmail(email);
                 return;
             case 5:
                 System.out.print("Client's new phone number:");
                 phone = input.nextLine();
-                System.out.println();
                 client.setPhone(phone);
                 return;
             case 6:
                 System.out.print("Client's new password: ");
                 password = input.nextLine();
-                System.out.println();
                 client.setPassword(password);
                 return;
             case 7:
                 System.out.print("Client's type: ");
                 type = input.nextInt();
-                System.out.println();
                 client.setType(type);
                 return;
             default:
@@ -165,38 +143,27 @@ public class Admin extends User {
         System.out.print("Trip code: ");
         Scanner input = new Scanner(System.in);
         int code = input.nextInt();
-        System.out.println();
         System.out.print("Trip origin: ");
         String origin = input.nextLine();
-        System.out.println();
         System.out.print("Trip destiny: ");
         String destiny = input.nextLine();
-        System.out.println();
         System.out.print("Trip price: ");
         Double price = input.nextDouble();
-        System.out.println();
         System.out.print("Trip duration: ");
         Double duration = input.nextDouble();
-        System.out.println();
         System.out.print("Trip minute: ");
         int minute = input.nextInt();
-        System.out.println();
         System.out.print("Trip hour: ");
         int hour = input.nextInt();
-        System.out.println();
         System.out.print("Trip day: ");
         int day = input.nextInt();
-        System.out.println();
         System.out.print("Trip month: ");
         int month = input.nextInt();
-        System.out.println();
         System.out.print("Trip year: ");
         int year = input.nextInt();
-        System.out.println();
         Date date = new Date(minute, hour, day, month, year);
         System.out.print("Number of buses used: ");
         int numBuses = input.nextInt();
-        System.out.println();
         ArrayList<Bus> buses = new ArrayList<>(numBuses);
         for (int i = 0; i < numBuses; i++) {
             buses.add(createBus());
@@ -211,7 +178,6 @@ public class Admin extends User {
         System.out.print("Code of Trip to delete: ");
         Scanner input = new Scanner(System.in);
         int code = input.nextInt();
-        System.out.println();
         for (int i = 0; i < trips.size(); i++) {
             if (trips.get(i).getCode() == code) {
                 trips.remove(i);
@@ -243,34 +209,24 @@ public class Admin extends User {
             case 0:
                 System.out.print("Trip new code: ");
                 code = input.nextInt();
-                System.out.println();
                 System.out.print("Trip new origin: ");
                 origin = input.nextLine();
-                System.out.println();
                 System.out.print("Trip new destiny: ");
                 destiny = input.nextLine();
-                System.out.println();
                 System.out.print("Trip new price: ");
                 price = input.nextDouble();
-                System.out.println();
                 System.out.print("Trip new duration:");
                 duration = input.nextDouble();
-                System.out.println();
                 System.out.println("Trip new minute: ");
                 minute = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new hour: ");
                 hour = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new day: ");
                 day = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new month: ");
                 month = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new year: ");
                 year = input.nextInt();
-                System.out.println();
                 date = new Date(minute, hour, day, month, year);
                 trip.setCode(code);
                 trip.setOrigin(origin);
@@ -282,13 +238,11 @@ public class Admin extends User {
             case 1:
                 System.out.print("Trip new code: ");
                 code = input.nextInt();
-                System.out.println();
                 trip.setCode(code);
                 return;
             case 2:
                 System.out.print("Trip new origin: ");
                 origin = input.nextLine();
-                System.out.println();
                 trip.setOrigin(origin);
                 return;
             case 3:
@@ -299,31 +253,24 @@ public class Admin extends User {
             case 4:
                 System.out.print("Trip new price: ");
                 price = input.nextDouble();
-                System.out.println();
                 trip.setPrice(price);
                 return;
             case 5:
                 System.out.print("Trip new duration:");
                 duration = input.nextDouble();
-                System.out.println();
                 trip.setDuration(duration);
                 return;
             case 6:
                 System.out.println("Trip new minute: ");
                 minute = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new hour: ");
                 hour = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new day: ");
                 day = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new month: ");
                 month = input.nextInt();
-                System.out.println();
                 System.out.println("Trip new year: ");
                 year = input.nextInt();
-                System.out.println();
                 date = new Date(minute, hour, day, month, year);
                 trip.setDate(date);
                 return;
@@ -353,12 +300,11 @@ public class Admin extends User {
         System.out.print("Bus license plate: ");
         Scanner input = new Scanner(System.in);
         String licensePlate = input.nextLine();
-        System.out.println();
         System.out.print("Bus capacity: ");
         int capacity = input.nextInt();
         System.out.println();
         boolean[] takenSeats = new boolean[capacity];
-        Bus bus = new Bus(licensePlate, capacity, takenSeats);
+        Bus bus = new Bus(licensePlate, capacity);
         return bus;
     }
 
@@ -366,7 +312,6 @@ public class Admin extends User {
         System.out.print("License Plate of bus to delete: ");
         Scanner input = new Scanner(System.in);
         String licensePlate = input.nextLine();
-        System.out.println();
         for (int i = 0; i < buses.size(); i++) {
             if (buses.get(i).getLicensePlate().equals(licensePlate)) {
                 buses.remove(i);
@@ -391,23 +336,19 @@ public class Admin extends User {
             case 0:
                 System.out.print("Bus new license plate: ");
                 licensePlate = input.nextLine();
-                System.out.println();
                 System.out.print("Bus new capacity: ");
                 capacity = input.nextInt();
-                System.out.println();
                 bus.setLicensePlate(licensePlate);
                 bus.setCapacity(capacity);
                 return;
             case 1:
                 System.out.print("Bus new license plate: ");
                 licensePlate = input.nextLine();
-                System.out.println();
                 bus.setLicensePlate(licensePlate);
                 return;
             case 2:
                 System.out.print("Bus new capacity: ");
                 capacity = input.nextInt();
-                System.out.println();
                 bus.setCapacity(capacity);
                 return;
             default:

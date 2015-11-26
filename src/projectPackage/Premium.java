@@ -3,7 +3,7 @@ package projectPackage;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO test
+//TODO implementar o metodo payment que vai ser chamado no menu aquando da reserva
 
 public class Premium extends Client {
 
@@ -11,62 +11,50 @@ public class Premium extends Client {
         super(name, nif, address, email, phone, password, type, clientReserves);
     }
 
-    //Ver se itera
     public void listAvaiableTrips(ArrayList<Trip> trips) {
         for (Trip trip: trips) {
-            for (Bus bus : trip.getBuses()) {
-                boolean[] takenSeats = bus.getTakenSeats();
-                boolean toBreakLoop = false;
-                for (boolean takenSeat : takenSeats) {
-                    if (!takenSeat) {
-                        System.out.println(trip);
-                        toBreakLoop = true;
-                        break;
-                    }
-                }
-                if (toBreakLoop) {
+            Bus bus = trip.getBuses().get(0);
+            boolean[] takenSeats = bus.getTakenSeats();
+            for (boolean takenSeat : takenSeats) {
+                if (!takenSeat) {
+                    System.out.println(trip);
                     break;
                 }
             }
         }
     }
 
-    public int seatReserveSecurity(ArrayList<Bus> buses) {
+    public int seatReserveSecurity(Bus bus) {
         System.out.print("Seat number in the bus you prefer: ");
         Scanner input = new Scanner(System.in);
-        System.out.println();
-        int seatNumber = input.nextInt();
-        for (Bus bus : buses) {
-            if (!((bus.getTakenSeats())[seatNumber])) {
-                bus.setTakenSeats(seatNumber);
-                System.out.println("Operation Sucefull");
-                return seatNumber;
-            }
-            else {
-                System.out.println("Seat was already taken");
-                while (true) {
-                    System.out.print("Input a different seat number: ");
-                    seatNumber = input.nextInt();
-                    if (!((bus.getTakenSeats())[seatNumber])) {
-                        bus.setTakenSeats(seatNumber);
-                        System.out.println("Operation Sucefull");
-                        return seatNumber;
-                    }
+        int seatNumber = input.nextInt() - 1;
+        if (!bus.getTakenSeats()[seatNumber]) {
+            bus.addTakenSeat(seatNumber);
+            System.out.println("Operation Sucefull");
+            return seatNumber;
+        }
+        else {
+            System.out.println("Seat was already taken");
+            while (true) {
+                System.out.print("Choose a different seat number: ");
+                seatNumber = input.nextInt() - 1;
+                if (!((bus.getTakenSeats())[seatNumber])) {
+                    bus.addTakenSeat(seatNumber);
+                    System.out.println("Operation Sucefull");
+                    return seatNumber;
                 }
             }
         }
-        return seatNumber;
     }
 
-    //TODO Quando se reserva pagar
     public void reserveTrip(ArrayList<Trip> trips) {
         System.out.print("Trip to reserve(code): ");
-        System.out.println();
         Scanner input = new Scanner(System.in);
         int code = input.nextInt();
         for (Trip trip: trips) {
             if (trip.getCode() == code) {
-                int seatNumber = seatReserveSecurity(trip.getBuses());
+                Bus firstBus = trip.getBuses().get(0);
+                int seatNumber = seatReserveSecurity(firstBus);
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
                 break;
@@ -74,21 +62,23 @@ public class Premium extends Client {
         }
     }
 
-    public void listReserves(ArrayList<Reserve> reserves) {
-        for (Reserve reserve : reserves)
+    public void listReserves() {
+        for (Reserve reserve : this.getClientReserves())
             System.out.println(reserve);
     }
 
-    //TODO verificar quando recebe reembolso ou nao
+    //TODO so preciso de verificar quando recebe reembolso ou nao
     public void cancelReserve() {
         System.out.print("Trip code of reserve to cancel: ");
-        System.out.println();
         Scanner input = new Scanner(System.in);
         int code = input.nextInt();
         ArrayList<Reserve> reserves = this.getClientReserves();
-        for (Reserve reserve: reserves) {
-            if (reserve.getTrip().getCode() == code) {
-                reserves.remove(reserve.getTrip().getCode());
+        for (Reserve reserve : reserves) {
+            int tripCode = reserve.getTrip().getCode();
+            if (tripCode == code) {
+                int seatNumber = reserve.getSeatNumber();
+                reserve.getTrip().getBuses().get(0).deleteTakenSeat(seatNumber);
+                reserves.remove(reserve);
                 System.out.println("Operation Successful");
                 return;
             }
@@ -96,7 +86,7 @@ public class Premium extends Client {
 
     }
 
-    //Verificar se funciona quando o user da apenas enter
+    //TODO Verificar se funciona quando o user da apenas enter
     public void addCommentTrip(Trip trip) {
         System.out.print("Rating you want to give the trip: ");
         Scanner input = new Scanner(System.in);

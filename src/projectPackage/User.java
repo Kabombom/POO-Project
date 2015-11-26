@@ -72,6 +72,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", password='" + password + '\'' +
+                ", type=" + type +
                 '}';
     }
 }
