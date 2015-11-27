@@ -49,11 +49,10 @@ public class Agency implements Menu {
         Premium premium8 = new Premium("Machado8", "9", "9", "mail9", "324349", "isto9", 2, reserves8);
 
         premium1.reserveTrip(trips);
-        premium2.reserveTrip(trips);
-        premium2.cancelReserve();
-        premium3.listAvaiableTrips(trips);
         premium1.reserveTrip(trips);
-        premium3.listAvaiableTrips(trips);
+        premium1.listReserves();
+        premium1.cancelReserve();
+        premium1.listReserves();
     }
 
 }

@@ -1,7 +1,5 @@
 package projectPackage;
 
-//TODO MUDAR O construtor por causa do array
-
 public class Bus {
     private String licensePlate;
     private int capacity;
