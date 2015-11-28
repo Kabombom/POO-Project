@@ -26,9 +26,7 @@ public class Regular extends Client{
     public boolean seatReserveSecurity(Bus bus, String strInput) {
         try {
             int seatNumber = Integer.parseInt(strInput);
-            if (seatNumber <= 0 || seatNumber > bus.getCapacity() || bus.getTakenSeats()[seatNumber])
-                return false;
-            return true;
+            return !(seatNumber <= 0 || seatNumber > bus.getCapacity() || bus.getTakenSeats()[seatNumber]);
 
         } catch (NumberFormatException e) {
             return false;
@@ -43,9 +41,7 @@ public class Regular extends Client{
         }
         try {
             int code = Integer.parseInt(strInput);
-            if (code <= 0 || code > biggestTripCode)
-                return false;
-            return true;
+            return !(code <= 0 || code > biggestTripCode);
 
         } catch (NumberFormatException e) {
             return false;
@@ -95,9 +91,7 @@ public class Regular extends Client{
     public boolean cancelReserveCodeSecurity(String strInput, int[] codesOfTrip) {
         try {
             int code = Integer.parseInt(strInput);
-            if (!checksIfReserveCodeExists(code, codesOfTrip))
-                return false;
-            return true;
+            return checksIfReserveCodeExists(code, codesOfTrip);
 
         } catch (NumberFormatException e) {
             return false;
