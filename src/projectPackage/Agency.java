@@ -1,8 +1,82 @@
 package projectPackage;
 
+import java.io.*;
 import java.util.ArrayList;
 
-public class Agency implements Menu {
+//TODO OS FICHEIROS CRIADOS NAO ESTAO CRIADOS NO SITIO CORRETO
+//CORRIGIR O PATH
+
+
+public class Agency implements Ficheiro, Menu{
+
+    public void writeOneLine(File toWrite, String line) {
+        try	{
+            PrintWriter writer = new PrintWriter(new FileWriter(toWrite));
+            writer.println(line);
+            System.out.println(line);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File doesn't exist");
+        }
+        catch (IOException e)	{
+            System.out.println("General I/O Exception " + e.getMessage());
+        }
+    }
+
+    public String readLine(File toRead) {
+        String line = "";
+        try	{
+            BufferedReader reader = new BufferedReader(new FileReader(toRead));
+            if ((line = reader.readLine()) != null)
+                return line;
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File doesn't exist");
+        }
+        catch (IOException e)	{
+            System.out.println("General I/O Exception " + e.getMessage());
+        }
+        return  line;
+    }
+
+    //Verificar se funciona assim
+    public Object rObject(ObjectInputStream inputStream) {
+        Object toReturn = null;
+        try {
+            toReturn = inputStream.readObject();
+            return toReturn;
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class not found");
+        }
+        catch (IOException e) {
+            System.out.println("General I/O Exception " + e.getMessage());
+        }
+        return toReturn;
+    }
+
+    public void wObject(ObjectOutputStream outputStream, Object obj) {
+        try {
+            outputStream.writeObject(obj);
+        } catch (IOException e) {
+            System.out.println("General I/O Exception " + e.getMessage());
+        }
+    }
+
+    public boolean login() {
+        return false;
+    }
+
+    public void logout() {
+
+    }
+
+    public void adminMenu() {
+
+    }
+
+    public void clientMenu() {
+
+    }
 
     public static void main(String[] args) {
         //ATRIBUTOS DA AGENCIA
@@ -17,8 +91,6 @@ public class Agency implements Menu {
         //COMENTARIOS
         ArrayList<Coment> coments = new ArrayList<>();
 
-        //MUDAR OS AUTOCARROS NO CONSTRUTOR PORQUE O ARRAY TEM DE SER INICIALIZADO
-        boolean[] takenSeats = new boolean[2];
         Bus bus = new Bus("1", 2);
         Bus bus2 = new Bus("2", 2);
         buses.add(bus);
@@ -51,8 +123,17 @@ public class Agency implements Menu {
         premium1.reserveTrip(trips);
         premium1.reserveTrip(trips);
         premium1.listReserves();
+        premium1.listAvaiableTrips(trips);
         premium1.cancelReserve();
-        premium1.listReserves();
+        premium1.listAvaiableTrips(trips);
+
+        File fp = new File("src/projectPackage/teste.txt");
+        Agency agencia = new Agency();
+        agencia.writeOneLine(fp, "oi");
+        agencia.writeOneLine(fp, "oi2");
     }
+
+    //------------------------------------------------------------TESTAR A PARTE HOJE A NOITE-----------------------------------------------------------------------------
+
 
 }

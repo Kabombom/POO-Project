@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 //TODO implementar o metodo payment que vai ser chamado no menu aquando da reserva
+//TODO implementar seguranças no client
 
 public class Premium extends Client {
 
@@ -28,7 +29,7 @@ public class Premium extends Client {
     public boolean seatReserveSecurity(Bus bus, String strInput) {
         try {
             int seatNumber = Integer.parseInt(strInput);
-            return !(seatNumber <= 0 || seatNumber > bus.getCapacity() || bus.getTakenSeats()[seatNumber]);
+            return !(seatNumber <= 0 || seatNumber > bus.getCapacity() || bus.getTakenSeats()[seatNumber - 1]);
 
         } catch (NumberFormatException e) {
             return false;
@@ -46,12 +47,13 @@ public class Premium extends Client {
 
     }
 
+    //TODO dar segurança ao codigo da trip que o user pode dar input
     public void reserveTrip(ArrayList<Trip> trips) {
         Scanner input = new Scanner(System.in);
         System.out.print("Code of trip to reserve: ");
         String strInput = input.nextLine();
         while (!reserveTripCodeSecurity(strInput)) {
-            System.out.print("Invalid input, code of trip to resereve: ");
+            System.out.print("Invalid input, code of trip to reserve: ");
             strInput = input.nextLine();
         }
         int tripCode = Integer.parseInt(strInput);
@@ -64,7 +66,8 @@ public class Premium extends Client {
                     System.out.print("Invalid input, seat number in the bus to reserve: ");
                     strInput = input.nextLine();
                 }
-                int seatNumber = Integer.parseInt(strInput);
+                int seatNumber = Integer.parseInt(strInput) - 1;
+                firstBus.addTakenSeat(seatNumber);
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
                 break;
@@ -96,6 +99,7 @@ public class Premium extends Client {
     }
 
     //TODO so preciso de verificar quando recebe reembolso ou nao
+    //TODO dar segurança ao codigo da trip que o user pode dar input
     public void cancelReserve() {
         ArrayList<Reserve> reserves = this.getClientReserves();
         int[] codesOfTrip = new int[reserves.size()];
@@ -153,5 +157,10 @@ public class Premium extends Client {
     public void listCommentsTrip(ArrayList<Coment> coments) {
         for (Coment coment : coments)
             System.out.println(coment);
+    }
+
+
+    public int payment(Trip trip) {
+        return 0;
     }
 }

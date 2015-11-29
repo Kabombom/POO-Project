@@ -26,7 +26,7 @@ public class Regular extends Client{
     public boolean seatReserveSecurity(Bus bus, String strInput) {
         try {
             int seatNumber = Integer.parseInt(strInput);
-            return !(seatNumber <= 0 || seatNumber > bus.getCapacity() || bus.getTakenSeats()[seatNumber]);
+            return !(seatNumber <= 0 || seatNumber > bus.getCapacity() || bus.getTakenSeats()[seatNumber - 1]);
 
         } catch (NumberFormatException e) {
             return false;
@@ -67,7 +67,8 @@ public class Regular extends Client{
                     System.out.print("Invalid input, seat number in the bus to reserve: ");
                     strInput = input.nextLine();
                 }
-                int seatNumber = Integer.parseInt(strInput);
+                int seatNumber = Integer.parseInt(strInput) - 1;
+                firstBus.addTakenSeat(seatNumber);
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
                 break;
@@ -157,4 +158,10 @@ public class Regular extends Client{
         for (Coment coment : coments)
             System.out.println(coment);
     }
+
+    public int payment(Trip trip) {
+        return 0;
+    }
+
+
 }
