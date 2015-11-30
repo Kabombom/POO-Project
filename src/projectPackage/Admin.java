@@ -2,14 +2,15 @@ package projectPackage;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.StringJoiner;
+
+//TODO permitir o admin dar delete a outros admins?d
 
 public class Admin extends User {
 
     public Admin(String name, String nif, String address, String email, String phone, String password, int type) {
         super(name, nif, address, email, phone, password, type);
     }
-
-    //TODO Mudar o input do type
 
     public boolean optionsSecurity(String strInput) {
         try {
@@ -20,6 +21,7 @@ public class Admin extends User {
         }
     }
 
+    //TODO Mudar o input do type
     public Client createClient() {
         Client client;
         System.out.print("Client name: ");
@@ -47,15 +49,13 @@ public class Admin extends User {
         return  client;
     }
 
-    public void deleteClient(ArrayList<Client> clients) {
-        System.out.print("Name of client to delete: ");
+    public void deleteClient(ArrayList<User> users) {
         Scanner input = new Scanner(System.in);
-        String name = input.nextLine();
         System.out.print("NIF of client to delete: ");
         String nif = input.nextLine();
-        for (int i = 0; i < clients.size(); i++) {
-            if (clients.get(i).getName().equals(name) && clients.get(i).getNif().equals(nif)) {
-                clients.remove(i);
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getNif().equals(nif)) {
+                users.remove(i);
                 System.out.println("Client sucefully removed");
                 return;
             }
@@ -166,16 +166,26 @@ public class Admin extends User {
         System.out.println("Operation sucefull");
     }
 
-    public void listClients(ArrayList<Client> clients) {
-        for (Client client : clients) {
-            System.out.println(client);
+    public void listClients(ArrayList<User> users) {
+        for (User user : users) {
+            Client client = (Client) user;
+            if (client.getType() == 2 || client.getType() == 3)
+                System.out.println(client);
         }
+    }
+
+    public boolean checkIfTripCodeExists(int code, ArrayList<Trip> trips) {
+        for (Trip trip: trips) {
+            if (trip.getCode() == code)
+                return true;
+        }
+        return false;
     }
 
     public boolean tripCodeSecurity(String strInput) {
         try {
             int code = Integer.parseInt(strInput);
-            return !(code <= 0);
+            return !(code <= 0 || !checkIfTripCodeExists(code, t));
         } catch (NumberFormatException e) {
             return false;
         }
@@ -349,7 +359,7 @@ public class Admin extends User {
 
     //Permite se alterar tambem os comentarios?
     //Mudar capacidade do autocarro?
-    //TODO Permitir alterar apenas uma parte da date
+    //TODO Permitir alterar apenas uma parte da data
     public void modifyTrip(Trip trip) {
         int code, minute, hour, day, month, year;
         double price, duration;
@@ -568,15 +578,21 @@ public class Admin extends User {
     }
 
     //Acrescenta a opçao de poder mudar os lugares ocupados?
-    public void modifyBus(Bus bus) {
+    public void modifyBus(ArrayList<Bus> buses) {
+        Scanner input = new Scanner(System.in);
+        String strInput;
+        System.out.print("License ");
+        for (:
+             ) {
+
+        }
         String licensePlate, capacityInput;
         int capacity;
         System.out.println("[0] --> All\n"          +
-                           "[1] --> Licese Plate\n" +
+                           "[1] --> License Plate\n" +
                            "[2] --> Capacity");
         System.out.println("Which info of the bus do you want to modify: ");
-        Scanner input = new Scanner(System.in);
-        String strInput = input.nextLine();
+        strInput = input.nextLine();
         while (!optionsSecurity(strInput)) {
             System.out.print("Invalid input, info you want to modify: ");
             strInput = input.nextLine();

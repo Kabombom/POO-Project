@@ -2,9 +2,10 @@ package projectPackage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
-//TODO OS FICHEIROS CRIADOS NAO ESTAO CRIADOS NO SITIO CORRETO
-//CORRIGIR O PATH
+//TODO METER NAS SEGURANÇAS UMA FORMA DE SAIR DOS INPUTS
+//TODO nao premitir que 2 clientes tenham o mesmo email, nif.
 
 
 public class Agency implements Ficheiro, Menu{
@@ -62,16 +63,141 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public boolean login() {
-        return false;
+    public boolean choiceSecurity(String choiceInput) {
+        try {
+            int choice = Integer.parseInt(choiceInput);
+            return !(choice < 0 || choice > 1);
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
-    public void logout() {
-
+    //NAO DA RETURN AS RESERVAS
+    public User checkIfUserExists(String email, String password, ArrayList<User> users) {
+        for (User user : users) {
+            if (user.getEmail().equals(email) && user.getPassword().equals(password))
+                return user;
+        }
+        return null;
     }
 
-    public void adminMenu() {
+    public User login(ArrayList<User> users) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Welcome to COSTA & MACHADO travel agency");
+        System.out.println("To login press 1\nTo leave press 0");
+        String choiceInput = input.nextLine();
+        while (!choiceSecurity(choiceInput)) {
+            System.out.print("Invalid input");
+            choiceInput = input.nextLine();
+        }
+        int choice = Integer.parseInt(choiceInput);
+        switch (choice) {
+            case 0:
+                return null;
+            case 1:
+                System.out.print("EMAIL: ");
+                String email = input.nextLine();
+                System.out.print("PASSWORD: ");
+                String password = input.nextLine();
+                while(checkIfUserExists(email, password, users) == null) {
+                    System.out.println("User email or password invalid");
+                    System.out.print("EMAIL: ");
+                    email = input.nextLine();
+                    System.out.print("PASSWORD: ");
+                    password = input.nextLine();
+                }
+                return checkIfUserExists(email, password, users);
 
+         }
+        return null;
+    }
+
+    public boolean optionsSecurity(String  strInput) {
+        try {
+            int choice = Integer.parseInt(strInput);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public boolean tripCodeSecurity(String  strInput) {
+        try {
+            int choice = Integer.parseInt(strInput);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public void adminMenu(Admin admin, ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses) {
+        String strInput;
+        int choice;
+        Scanner input = new Scanner(System.in);
+        System.out.print("WELCOME TO THE ADMIN MENU\n"  +
+                         "[0] --> Leave Menu"           +
+                         "[1] --> Create Client"        +
+                         "[2] --> Modify Client"        +
+                         "[3] --> Delete Client"        +
+                         "[4] --> List Clients"         +
+                         "[5] --> Create Trip"          +
+                         "[6] --> Modify Trip"          +
+                         "[7] --> Delete Trip"          +
+                         "[8] --> List Trips"           +
+                         "[9] --> Create Bus"           +
+                         "[10] --> Modify Bus"          +
+                         "[11] --> Delete Bus"          +
+                         "[12] --> List Buses"          +
+                         "What do you wish to do: ");
+        strInput = input.nextLine();
+        while(!optionsSecurity(strInput)) {
+            System.out.print("Invalid input, What do you wish to do:");
+            strInput = input.nextLine();
+        }
+        choice = Integer.parseInt(strInput);
+        switch (choice) {
+            case 0:
+                return;
+            case 1:
+                users.add(admin.createClient());
+                return;
+            case 2:
+                System.out.print("NIF of client to modify: ");
+                strInput = input.nextLine();
+                for (User user: users) {
+                    Client client = (Client) user;
+                    if (client.getNif().equals(strInput))
+                        admin.modifyClient(client);
+                }
+                return;
+            case 3:
+                admin.deleteClient(users);
+                return;
+            case 4:
+                admin.listClients(users);
+                return;
+            case 5:
+                trips.add(admin.createTrip());
+                return;
+            case 6:
+                System.out.print("Code of trip to modify: ");
+                strInput = input.nextLine();
+                while ()
+                return;
+            case 7:
+                admin.deleteTrip(trips);
+                return;
+            case 8:
+                admin.listTrips(trips);
+                return;
+            case 9:
+                buses.add(admin.createBus());
+                return;
+            case 10:
+
+
+
+        }
     }
 
     public void clientMenu() {
@@ -132,8 +258,4 @@ public class Agency implements Ficheiro, Menu{
         agencia.writeOneLine(fp, "oi");
         agencia.writeOneLine(fp, "oi2");
     }
-
-    //------------------------------------------------------------TESTAR A PARTE HOJE A NOITE-----------------------------------------------------------------------------
-
-
 }

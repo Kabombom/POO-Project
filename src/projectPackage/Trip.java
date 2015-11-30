@@ -41,6 +41,7 @@ public class Trip {
     public double getDuration() { return duration; }
     public void setDuration(double duration) { this.duration = duration; }
 
+
     public ArrayList<Bus> getBuses() { return buses; }
     public void setBuses(ArrayList<Bus> buses) { this.buses = buses; }
 

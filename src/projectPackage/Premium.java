@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 //TODO implementar o metodo payment que vai ser chamado no menu aquando da reserva
 //TODO implementar seguranças no client
+//O cliente ao reservar se a trip nao estiver disponivel faz se a lista de espera, na segurança so preciso de verificar se o codigo existee
 
 public class Premium extends Client {
 
@@ -13,6 +14,7 @@ public class Premium extends Client {
     }
 
     public void listAvaiableTrips(ArrayList<Trip> trips) {
+        System.out.println("Avaiable trips:");
         for (Trip trip: trips) {
             Bus bus = trip.getBuses().get(0);
             boolean[] takenSeats = bus.getTakenSeats();
@@ -25,7 +27,6 @@ public class Premium extends Client {
         }
     }
 
-    //TODO Listar os lugares disponiveis
     public boolean seatReserveSecurity(Bus bus, String strInput) {
         try {
             int seatNumber = Integer.parseInt(strInput);
@@ -36,30 +37,44 @@ public class Premium extends Client {
         }
     }
 
-    public boolean reserveTripCodeSecurity(String strInput) {
+    public boolean checkIfTripCodeExists(int code, ArrayList<Trip> trips) {
+        for (Trip trip: trips) {
+            if (trip.getCode() == code)
+                return true;
+        }
+        return false;
+    }
+
+    public boolean reserveTripCodeSecurity(String strInput, ArrayList<Trip> trips) {
         try {
             int code = Integer.parseInt(strInput);
-            return !(code <= 0);
-
+            return !(code <= 0 || !checkIfTripCodeExists(code, trips));
         } catch (NumberFormatException e) {
             return false;
         }
-
     }
 
-    //TODO dar segurança ao codigo da trip que o user pode dar input
     public void reserveTrip(ArrayList<Trip> trips) {
+        listAvaiableTrips(trips);
         Scanner input = new Scanner(System.in);
         System.out.print("Code of trip to reserve: ");
         String strInput = input.nextLine();
-        while (!reserveTripCodeSecurity(strInput)) {
+        while (!reserveTripCodeSecurity(strInput, trips)) {
             System.out.print("Invalid input, code of trip to reserve: ");
             strInput = input.nextLine();
         }
         int tripCode = Integer.parseInt(strInput);
+
         for (Trip trip: trips) {
             if (trip.getCode() == tripCode) {
                 Bus firstBus = trip.getBuses().get(0);
+                System.out.println("Seats avaiable in the bus: ");
+                boolean[] takenSeats = firstBus.getTakenSeats();
+                for (int i = 0; i < takenSeats.length; i++) {
+                    if (!takenSeats[i])
+                        System.out.println(i + 1);
+                }
+
                 System.out.print("Seat in the bus to reserve: ");
                 strInput = input.nextLine();
                 while(!seatReserveSecurity(firstBus, strInput)) {
@@ -80,18 +95,18 @@ public class Premium extends Client {
             System.out.println(reserve);
     }
 
-    public boolean checksIfReserveCodeExists(int code, int[] codesOfTrips) {
-        for (int codesOfTrip : codesOfTrips) {
-            if (code == codesOfTrip)
+    public boolean checksIfReserveCodeExists(int code, ArrayList<Reserve> reserves) {
+        for (Reserve reserve : reserves) {
+            if (code == reserve.getTrip().getCode())
                 return true;
         }
         return false;
     }
 
-    public boolean cancelReserveCodeSecurity(String strInput, int[] codesOfTrip) {
+    public boolean cancelReserveCodeSecurity(String strInput, ArrayList<Reserve> reserves) {
         try {
             int code = Integer.parseInt(strInput);
-            return checksIfReserveCodeExists(code, codesOfTrip);
+            return checksIfReserveCodeExists(code, reserves);
 
         } catch (NumberFormatException e) {
             return false;
@@ -99,28 +114,32 @@ public class Premium extends Client {
     }
 
     //TODO so preciso de verificar quando recebe reembolso ou nao
-    //TODO dar segurança ao codigo da trip que o user pode dar input
     public void cancelReserve() {
+        this.listReserves();
         ArrayList<Reserve> reserves = this.getClientReserves();
-        int[] codesOfTrip = new int[reserves.size()];
-        for (int i = 0; i < reserves.size(); i++) {
-            Reserve reserve = reserves.get(i);
-            codesOfTrip[i] = reserve.getTrip().getCode();
+        System.out.println("Code of trips you have reserved: ");
+        for (Reserve reserve : reserves) {
+            int code = reserve.getTrip().getCode();
+            System.out.println(code);
         }
+
         Scanner input = new Scanner(System.in);
         System.out.print("Trip code of the reserve to cancel: ");
         String strInput = input.nextLine();
-        while(!cancelReserveCodeSecurity(strInput, codesOfTrip)) {
-            System.out.println("Invalid input, trip code of the reserve to cancel: ");
+        while(!cancelReserveCodeSecurity(strInput, reserves)) {
+            System.out.print("Invalid input, trip code of the reserve to cancel: ");
             strInput = input.nextLine();
         }
         int code = Integer.parseInt(strInput);
-        for (Reserve reserve : reserves) {
+
+        for (int i = 0; i < reserves.size(); i++) {
+            Reserve reserve = reserves.get(i);
             int tripCode = reserve.getTrip().getCode();
+            Bus firstBus = reserve.getTrip().getBuses().get(0);
             if (tripCode == code) {
                 int seatNumber = reserve.getSeatNumber();
-                reserve.getTrip().getBuses().get(0).deleteTakenSeat(seatNumber);
-                reserves.remove(reserve);
+                firstBus.deleteTakenSeat(seatNumber);
+                reserves.remove(i);
                 System.out.println("Operation Successful");
                 return;
             }
@@ -159,8 +178,7 @@ public class Premium extends Client {
             System.out.println(coment);
     }
 
-
-    public int payment(Trip trip) {
-        return 0;
+    public double payment(Trip trip) {
+        return (trip.getPrice() - (trip.getPrice() * 0.1));
     }
 }
