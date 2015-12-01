@@ -8,6 +8,7 @@ public class Regular extends Client{
     public Regular(String name, String nif, String address, String email, String phone, String password, int type, ArrayList<Reserve> clientReserves) {
         super(name, nif, address, email, phone, password, type, clientReserves);
     }
+
     public void listAvaiableTrips(ArrayList<Trip> trips) {
         System.out.println("Avaiable trips:");
         for (Trip trip: trips) {
@@ -32,7 +33,7 @@ public class Regular extends Client{
         }
     }
 
-    public boolean checkIfTripCodeExists(int code, ArrayList<Trip> trips) {
+    public boolean checkIfTripCodeExists(ArrayList<Trip> trips, int code) {
         for (Trip trip: trips) {
             if (trip.getCode() == code)
                 return true;
@@ -40,21 +41,21 @@ public class Regular extends Client{
         return false;
     }
 
-    public boolean reserveTripCodeSecurity(String strInput, ArrayList<Trip> trips) {
+    public boolean tripCodeSecurity(ArrayList<Trip> trips, String strInput) {
         try {
             int code = Integer.parseInt(strInput);
-            return !(code <= 0 || !checkIfTripCodeExists(code, trips));
+            return !(code <= 0 || !checkIfTripCodeExists(trips, code));
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    public void reserveTrip(ArrayList<Trip> trips) {
+    public double reserveTrip(ArrayList<Trip> trips) {
         listAvaiableTrips(trips);
         Scanner input = new Scanner(System.in);
         System.out.print("Code of trip to reserve: ");
         String strInput = input.nextLine();
-        while (!reserveTripCodeSecurity(strInput, trips)) {
+        while (!tripCodeSecurity(trips, strInput)) {
             System.out.print("Invalid input, code of trip to reserve: ");
             strInput = input.nextLine();
         }
@@ -80,9 +81,10 @@ public class Regular extends Client{
                 firstBus.addTakenSeat(seatNumber);
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
-                break;
+                return payment(trip);
             }
         }
+        return 0;
     }
 
     public void listReserves() {
@@ -101,7 +103,7 @@ public class Regular extends Client{
     public boolean cancelReserveCodeSecurity(String strInput, ArrayList<Reserve> reserves) {
         try {
             int code = Integer.parseInt(strInput);
-            return !(code <= 0 || !checksIfReserveCodeExists(code, reserves));
+            return checksIfReserveCodeExists(code, reserves);
 
         } catch (NumberFormatException e) {
             return false;
@@ -127,12 +129,14 @@ public class Regular extends Client{
         }
         int code = Integer.parseInt(strInput);
 
-        for (Reserve reserve : reserves) {
+        for (int i = 0; i < reserves.size(); i++) {
+            Reserve reserve = reserves.get(i);
             int tripCode = reserve.getTrip().getCode();
+            Bus firstBus = reserve.getTrip().getBuses().get(0);
             if (tripCode == code) {
                 int seatNumber = reserve.getSeatNumber();
-                reserve.getTrip().getBuses().get(0).deleteTakenSeat(seatNumber);
-                reserves.remove(reserve);
+                firstBus.deleteTakenSeat(seatNumber);
+                reserves.remove(i);
                 System.out.println("Operation Successful");
                 return;
             }
@@ -148,22 +152,43 @@ public class Regular extends Client{
         }
     }
 
-    //TODO segurança de dar filter em certas palavras nos comentarios
-    public void addCommentTrip(Trip trip) {
+    public int indexOfTrip(ArrayList<Trip> trips, int code) {
+        int i;
+        for (i = 0; i < trips.size(); i++) {
+            if (trips.get(i).getCode() == code)
+                return i;
+        }
+        return i;
+    }
+
+    public void addCommentTrip(ArrayList<Trip> trips) {
+        String strInput, comm;
+        double rating;
+        int code, index;
         Scanner input = new Scanner(System.in);
+
+        System.out.print("Code of trip to rate and/or comment: ");
+        strInput = input.nextLine();
+        while (!tripCodeSecurity(trips, strInput)) {
+            System.out.print("Invalid input, trip to rate and/or comment: ");
+            strInput = input.nextLine();
+        }
+        code = Integer.parseInt(strInput);
+        index = indexOfTrip(trips, code);
+
         System.out.print("Rating you want to give the trip(1 to 5): ");
-        String strInput = input.nextLine();
+        strInput = input.nextLine();
         while (!ratingSecurity(strInput)) {
             System.out.print("Invalid input, rating of trip(1 to 5: ");
             strInput = input.nextLine();
         }
-        double rating = Double.parseDouble(strInput);
+        rating = Double.parseDouble(strInput);
         System.out.print("If you want, add a comment: ");
-        String comm = input.nextLine();
+        comm = input.nextLine();
         Coment coment = new Coment(comm, rating);
-        ArrayList<Coment> coments = trip.getComents();
+        ArrayList<Coment> coments = trips.get(index).getComents();
         coments.add(coment);
-        trip.setComents(coments);
+        trips.get(index).setComents(coments);
     }
 
     public void listCommentsTrip(ArrayList<Coment> coments) {
@@ -174,5 +199,4 @@ public class Regular extends Client{
     public double payment(Trip trip) {
         return trip.getPrice();
     }
-
 }

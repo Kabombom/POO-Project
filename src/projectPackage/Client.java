@@ -16,10 +16,10 @@ public abstract class Client extends User{
     public void setClientReserves(ArrayList<Reserve> clientReserves) { this.clientReserves = clientReserves; }
 
     public abstract void listAvaiableTrips(ArrayList<Trip> trips);
-    public abstract void reserveTrip(ArrayList<Trip> trips);
+    public abstract double reserveTrip(ArrayList<Trip> trips);
     public abstract void listReserves();
     public abstract void cancelReserve();
-    public abstract void addCommentTrip(Trip trip);
+    public abstract void addCommentTrip(ArrayList<Trip> trips);
     public abstract void listCommentsTrip(ArrayList<Coment> coments);
     public abstract double payment(Trip trip);
 }

@@ -4,11 +4,40 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+//TODO METER SEGURANÇAS NOS INPUTS AO CRIAR CLIENT
+//TODO nao premitir que 2 clientes tenham o mesmo email, nif. Trips com mesmo codigo. Buses com mesma license plate.
 //TODO METER NAS SEGURANÇAS UMA FORMA DE SAIR DOS INPUTS
-//TODO nao premitir que 2 clientes tenham o mesmo email, nif.
-
+//TODO waiting list
+//admins podem mudar admins? Atraves de uma password secreta definida na agencia?
+//verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
+//acabar de testar melhor tyudo e melhorar a ligaçao entre os menus
 
 public class Agency implements Ficheiro, Menu{
+    private ArrayList<User> users = new ArrayList<>();
+    private ArrayList<Trip> trips = new ArrayList<>();
+    private ArrayList<Bus> buses = new ArrayList<>();
+    private double profit;
+
+    public Agency(ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses, double profit) {
+        this.users = users;
+        this.trips = trips;
+        this.buses = buses;
+        this.profit = profit;
+    }
+
+    public ArrayList<User> getUsers() { return users; }
+    public void setUsers(ArrayList<User> users) { this.users = users; }
+
+    public ArrayList<Trip> getTrips() { return trips; }
+    public void setTrips(ArrayList<Trip> trips) { this.trips = trips; }
+
+    public ArrayList<Bus> getBuses() { return buses;}
+    public void setBuses(ArrayList<Bus> buses) { this.buses = buses; }
+
+    public double getProfit() { return profit; }
+    public void setProfit(double profit) { this.profit = profit; }
+
+
 
     public void writeOneLine(File toWrite, String line) {
         try	{
@@ -91,9 +120,12 @@ public class Agency implements Ficheiro, Menu{
             choiceInput = input.nextLine();
         }
         int choice = Integer.parseInt(choiceInput);
+        if (choice == 0)
+            return null;
+
         switch (choice) {
             case 0:
-                return null;
+                break;
             case 1:
                 System.out.print("EMAIL: ");
                 String email = input.nextLine();
@@ -107,7 +139,6 @@ public class Agency implements Ficheiro, Menu{
                     password = input.nextLine();
                 }
                 return checkIfUserExists(email, password, users);
-
          }
         return null;
     }
@@ -134,20 +165,21 @@ public class Agency implements Ficheiro, Menu{
         String strInput;
         int choice;
         Scanner input = new Scanner(System.in);
-        System.out.print("WELCOME TO THE ADMIN MENU\n"  +
-                         "[0] --> Leave Menu"           +
-                         "[1] --> Create Client"        +
-                         "[2] --> Modify Client"        +
-                         "[3] --> Delete Client"        +
-                         "[4] --> List Clients"         +
-                         "[5] --> Create Trip"          +
-                         "[6] --> Modify Trip"          +
-                         "[7] --> Delete Trip"          +
-                         "[8] --> List Trips"           +
-                         "[9] --> Create Bus"           +
-                         "[10] --> Modify Bus"          +
-                         "[11] --> Delete Bus"          +
-                         "[12] --> List Buses"          +
+
+        System.out.print("WELCOME TO THE ADMIN MENU\n"    +
+                         "[0] --> Exit\t\t\t"             +
+                         "[1] --> Create Client\n"        +
+                         "[2] --> Modify Client\t"        +
+                         "[3] --> Delete Client\n"        +
+                         "[4] --> List Clients\t"         +
+                         "[5] --> Create Trip\n"          +
+                         "[6] --> Modify Trip\t\t"        +
+                         "[7] --> Delete Trip\n"          +
+                         "[8] --> List Trips\t\t"         +
+                         "[9] --> Create Bus\n"           +
+                         "[10] --> Modify Bus\t\t"        +
+                         "[11] --> Delete Bus\n"          +
+                         "\t\t[12] --> List Buses\n"      +
                          "What do you wish to do: ");
         strInput = input.nextLine();
         while(!optionsSecurity(strInput)) {
@@ -155,77 +187,120 @@ public class Agency implements Ficheiro, Menu{
             strInput = input.nextLine();
         }
         choice = Integer.parseInt(strInput);
+
         switch (choice) {
             case 0:
                 return;
             case 1:
                 users.add(admin.createClient());
-                return;
+                admin.listClients(users);
+                break;
             case 2:
-                System.out.print("NIF of client to modify: ");
-                strInput = input.nextLine();
-                for (User user: users) {
-                    Client client = (Client) user;
-                    if (client.getNif().equals(strInput))
-                        admin.modifyClient(client);
-                }
-                return;
+                admin.modifyClient(users);
+                admin.listClients(users);
+                break;
             case 3:
                 admin.deleteClient(users);
-                return;
+                admin.listClients(users);
+                break;
             case 4:
                 admin.listClients(users);
-                return;
+                break;
             case 5:
-                trips.add(admin.createTrip());
-                return;
+                trips.add(admin.createTrip(buses));
+                admin.listTrips(trips);
+                break;
             case 6:
-                System.out.print("Code of trip to modify: ");
-                strInput = input.nextLine();
-                while ()
-                return;
+                admin.modifyTrip(trips, buses);
+                admin.listTrips(trips);
+                break;
             case 7:
                 admin.deleteTrip(trips);
-                return;
+                admin.listTrips(trips);
+                break;
             case 8:
                 admin.listTrips(trips);
-                return;
+                break;
             case 9:
                 buses.add(admin.createBus());
-                return;
+                admin.listBuses(buses);
+                break;
             case 10:
-
-
-
+                admin.modifyBus(buses);
+                admin.listBuses(buses);
+                break;
+            case 11:
+                admin.deleteBus(buses);
+                admin.listBuses(buses);
+                break;
+            case 12:
+                admin.listBuses(buses);
+                break;
+            default:
+                System.out.println("Invalid operation");
         }
     }
 
-    public void clientMenu() {
+    public void clientMenu(Client client, ArrayList<Trip> trips) {
+        String strInput;
+        int choice;
+        double profitToAdd = this.getProfit();
+        Scanner input = new Scanner(System.in);
 
+        System.out.print("WELCOME TO THE CLIENT MENU\n"       +
+                         "[0] --> Leave Menu\t"               +
+                         "[1] --> List Avaiable Trips\n"      +
+                         "[2] --> Reserve Trip\t"             +
+                         "[3] --> Cancel Reserve\n"           +
+                         "[4] --> List Your Reserves\t"       +
+                         "[5] --> Rate and comment trip\n"    +
+                         "What do you wish to do: ");
+        strInput = input.nextLine();
+        while(!optionsSecurity(strInput)) {
+            System.out.print("Invalid input, What do you wish to do:");
+            strInput = input.nextLine();
+        }
+        choice = Integer.parseInt(strInput);
+
+        switch (choice) {
+            case 0:
+                return;
+            case 1:
+                client.listAvaiableTrips(trips);
+                break;
+            case 2:
+                profitToAdd += client.reserveTrip(trips);
+                this.setProfit(profitToAdd);
+                break;
+            case 3:
+                client.cancelReserve();
+                break;
+            case 4:
+                client.listReserves();
+                break;
+            case 5:
+                client.addCommentTrip(trips);
+                break;
+            default:
+                System.out.println("Invalid operation");
+        }
     }
 
     public static void main(String[] args) {
-        //ATRIBUTOS DA AGENCIA
-        ArrayList<Client> clients = new ArrayList<>();
+        ArrayList<User> users = new ArrayList<>();
         ArrayList<Trip> trips = new ArrayList<>();
         ArrayList<Bus> buses = new ArrayList<>();
-        double profit;
+        double profit = 0;
+        Agency agencia = new Agency(users, trips, buses, profit);
 
-        //DATA
         Date date = new Date(1 ,1 ,1 ,1 ,1);
-
-        //COMENTARIOS
         ArrayList<Coment> coments = new ArrayList<>();
-
         Bus bus = new Bus("1", 2);
         Bus bus2 = new Bus("2", 2);
         buses.add(bus);
         buses.add(bus2);
-
-        //VIAGEM
         Trip trip = new Trip(1, "oi", "adeus", 1, 1, date, buses, coments);
         trips.add(trip);
-
         ArrayList<Reserve> reserves = new ArrayList<>();
         ArrayList<Reserve> reserves2 = new ArrayList<>();
         ArrayList<Reserve> reserves3 = new ArrayList<>();
@@ -234,8 +309,6 @@ public class Agency implements Ficheiro, Menu{
         ArrayList<Reserve> reserves6 = new ArrayList<>();
         ArrayList<Reserve> reserves7 = new ArrayList<>();
         ArrayList<Reserve> reserves8 = new ArrayList<>();
-
-
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
         Premium premium1 = new Premium("Machado1", "2", "2", "mail2", "324342", "isto2", 2, reserves);
         Premium premium2 = new Premium("Machado2", "3", "3", "mail3", "324343", "isto3", 2, reserves2);
@@ -246,16 +319,16 @@ public class Agency implements Ficheiro, Menu{
         Premium premium7 = new Premium("Machado7", "8", "8", "mail8", "324348", "isto8", 2, reserves7);
         Premium premium8 = new Premium("Machado8", "9", "9", "mail9", "324349", "isto9", 2, reserves8);
 
-        premium1.reserveTrip(trips);
-        premium1.reserveTrip(trips);
-        premium1.listReserves();
-        premium1.listAvaiableTrips(trips);
-        premium1.cancelReserve();
-        premium1.listAvaiableTrips(trips);
-
-        File fp = new File("src/projectPackage/teste.txt");
-        Agency agencia = new Agency();
-        agencia.writeOneLine(fp, "oi");
-        agencia.writeOneLine(fp, "oi2");
+        users.add(admin);
+        users.add(premium1);
+        users.add(premium2);
+        users.add(premium3);
+        users.add(premium4);
+        users.add(premium5);
+        users.add(premium6);
+        users.add(premium7);
+        users.add(premium8);
+        User user = agencia.login(users);
+        agencia.adminMenu((Admin) user, users, trips, buses);
     }
 }
