@@ -6,7 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 
-//TODO os perguntar de novo ao professor o que era os resultados armazenados em ficheiro
+//Ver enunciado tudo o que e do 1 ao 8 e para ficheiros de texto
 public interface Ficheiro {
     public void writeOneLine(File toWrite, String line);
     public String readLine(File toRead);

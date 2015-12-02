@@ -10,6 +10,7 @@ public class Trip {
     private Date date;
     private ArrayList<Bus> buses;
     private ArrayList<Coment> coments;
+    private ArrayList<User> waitingList;
 
     public Trip(int code, String origin, String destiny, double price, double duration, Date date, ArrayList<Bus> buses, ArrayList<Coment> coments) {
         this.code = code;
@@ -20,6 +21,7 @@ public class Trip {
         this.date = date;
         this.buses = buses;
         this.coments = coments;
+        this.waitingList = new ArrayList<>();
     }
 
     //Getters and Setters
@@ -48,6 +50,9 @@ public class Trip {
     public ArrayList<Coment> getComents() { return coments; }
     public void setComents(ArrayList<Coment> coments) { this.coments = coments; }
 
+    public ArrayList<User> getWaitingList() { return waitingList; }
+    public void setWaitingList(ArrayList<User> waitingList) { this.waitingList = waitingList; }
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -60,5 +65,10 @@ public class Trip {
                 ", buses=" + buses +
                 ", coments=" + coments +
                 '}';
+    }
+
+    public void notifyWaitingList() {
+        System.out.println("Dear clients of Costa & Machado the " + this + " is now avaiable\n" +
+                           "If you wish to complete your reservation proceed with the payment, the first client to pay gets the reservation.");
     }
 }

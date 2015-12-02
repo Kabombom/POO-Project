@@ -21,5 +21,6 @@ public abstract class Client extends User{
     public abstract void cancelReserve();
     public abstract void addCommentTrip(ArrayList<Trip> trips);
     public abstract void listCommentsTrip(ArrayList<Coment> coments);
+    public abstract double leaveWaitingList(ArrayList<Trip> trips);
     public abstract double payment(Trip trip);
 }
