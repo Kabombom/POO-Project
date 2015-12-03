@@ -1,6 +1,7 @@
 package projectPackage;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 
 public class Regular extends Client{
@@ -31,7 +32,7 @@ public class Regular extends Client{
         listAvaiableTrips(trips);
         System.out.print("Code of trip to reserve: ");
         strInput = input.nextLine();
-        while (!tripCodeSecurity(trips, strInput)) {
+        while (!acessTripCodeSecurity(trips, strInput)) {
             System.out.print("Invalid input, code of trip to reserve: ");
             strInput = input.nextLine();
         }
@@ -112,13 +113,17 @@ public class Regular extends Client{
         }
     }
 
-    //TODO so preciso de verificar quando recebe reembolso ou nao
-    public void cancelReserve() {
-        int code, tripCode;
+    public double cancelReserve() {
+        int code, tripCode, differenceOfDates;
+        double profit;
+        //Getting current date
+        Calendar rightNow = Calendar.getInstance();
+
         String strInput;
         Scanner input = new Scanner(System.in);
-        Bus firstBus;
         Reserve reserve;
+        Trip trip;
+        Bus firstBus;
         ArrayList<Reserve> reserves = this.getClientReserves();
         ArrayList<User> waitingList;
 
@@ -133,11 +138,21 @@ public class Regular extends Client{
 
         for (int i = 0; i < reserves.size(); i++) {
             reserve = reserves.get(i);
-            waitingList = reserve.getTrip().getWaitingList();
-            tripCode = reserve.getTrip().getCode();
-            firstBus = reserve.getTrip().getBuses().get(0);
+            trip = reserve.getTrip();
+            tripCode = trip.getCode();
 
             if (tripCode == code) {
+                firstBus = trip.getBuses().get(0);
+                waitingList = trip.getWaitingList();
+                differenceOfDates = compareDates(rightNow, trip.getDate());
+                System.out.println(differenceOfDates);
+
+                if (differenceOfDates <= 7) {
+                    profit = payment(trip) * 0.5;
+                } else {
+                    profit = 0;
+                }
+
                 if (checkIfTripFull(firstBus)) {
                     for (User user : waitingList)
                         reserve.getTrip().notifyWaitingList();
@@ -146,9 +161,10 @@ public class Regular extends Client{
                 firstBus.deleteTakenSeat(reserve.getSeatNumber());
                 reserves.remove(i);
                 System.out.println("Operation Successful");
-                return;
+                return profit;
             }
         }
+        return 0;
     }
 
     public void addCommentTrip(ArrayList<Trip> trips) {
@@ -161,7 +177,7 @@ public class Regular extends Client{
 
         System.out.print("Code of trip to rate and/or comment: ");
         strInput = input.nextLine();
-        while (!tripCodeSecurity(trips, strInput)) {
+        while (!acessTripCodeSecurity(trips, strInput)) {
             System.out.print("Invalid input, trip to rate and/or comment: ");
             strInput = input.nextLine();
         }

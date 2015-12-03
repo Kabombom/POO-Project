@@ -13,10 +13,11 @@ public class Admin extends User {
     }
 
     //TODO Mudar o input do type
-    public Client createClient(ArrayList<User> users) {
-        String name, nif, address, email, phone, password, type;
+    public void createClient(ArrayList<User> users) {
+        int type;
+        String name, nif, address, email, phone, password, typeInput;
         Scanner input = new Scanner(System.in);
-        Client client;
+        ArrayList<Reserve> reserves = new ArrayList<>();
 
         System.out.print("Client name: ");
         name = input.nextLine();
@@ -35,7 +36,7 @@ public class Admin extends User {
         System.out.print("Client email: ");
         email = input.nextLine();
         while (checkIfEmailExists(users, email)) {
-            System.out.println("Email already exists, client email: ");
+            System.out.print("Email already exists, client email: ");
             email = input.nextLine();
         }
 
@@ -45,22 +46,38 @@ public class Admin extends User {
         System.out.print("Client password: ");
         password = input.nextLine();
 
-        System.out.println("Premium or Regular?");
-        type = input.nextLine();
-        ArrayList<Reserve> reserves = new ArrayList<>();
-        if (type.equals("Premium")){
-            client = new Premium(name,nif, address, email, phone, password, 2, reserves);
-        } else {
-            client = new Regular(name,nif, address, email, phone, password, 3, reserves);
+        System.out.print("[1] --> Admin\n" +
+                         "[2] --> Premium" +
+                         "[3] --> Regular");
+        typeInput = input.nextLine();
+        while (!typeSecurity(typeInput)) {
+            System.out.print("Invalid type, ");
+            typeInput = input.nextLine();
         }
-        System.out.println("Operation sucefull");
-        return  client;
+        type = Integer.parseInt(typeInput);
+
+        if (type == 1) {
+            Admin admin = new Admin(name, nif, address, email, phone, password, type);
+            users.add(admin);
+            System.out.println("Operation sucefull");
+        }
+        else if (type == 2) {
+            Premium premium = new Premium(name, nif, address, email, phone, password, type, reserves);
+            users.add(premium);
+            System.out.println("Operation sucefull");
+        }
+        else if (type == 3) {
+            Regular regular = new Regular(name, nif, address, email, phone, password, type, reserves);
+            users.add(regular);
+            System.out.println("Operation sucefull");
+        }
     }
 
-    public void deleteClient(ArrayList<User> users) {
+    public void deleteUser(ArrayList<User> users) {
         Scanner input = new Scanner(System.in);
-        System.out.print("NIF of client to delete: ");
+        System.out.print("NIF of user to delete: ");
         String nif = input.nextLine();
+
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getNif().equals(nif)) {
                 users.remove(i);
@@ -79,7 +96,7 @@ public class Admin extends User {
         System.out.print("NIF of client you want to modify: ");
         strInput = input.nextLine();
         while(!checkIfNifExists(users, strInput)) {
-            System.out.print("Invalid input, NIF of client you want to  modify: ");
+            System.out.print("Invalid Input, NIF of client you want to  modify: ");
             strInput = input.nextLine();
         }
         index = indexOfClient(users, strInput);
@@ -104,16 +121,30 @@ public class Admin extends User {
             case 0:
                 System.out.print("Client's new name: ");
                 name = input.nextLine();
+
                 System.out.print("Client's NIF: ");
                 nif = input.nextLine();
+                while (checkIfNifExists(users, nif)) {
+                    System.out.print("Invalid input, NIF of client you want to  modify: ");
+                    nif = input.nextLine();
+                }
+
                 System.out.print("Client's address: ");
                 address = input.nextLine();
+
                 System.out.print("Client's email: ");
                 email = input.nextLine();
+                while (checkIfEmailExists(users, email)) {
+                    System.out.println("Email already exists, client email: ");
+                    email = input.nextLine();
+                }
+
                 System.out.print("Client's phone number:");
                 phone = input.nextLine();
+
                 System.out.print("Client's password: ");
                 password = input.nextLine();
+
                 System.out.print("Client's type: ");
                 strInput = input.nextLine();
                 while (!typeSecurity(strInput)) {
@@ -194,13 +225,13 @@ public class Admin extends User {
     }
 
     //Mudar as strings de inputs
-    public Trip createTrip(ArrayList<Trip> trips, ArrayList<Bus> buses) {
+    public void createTrip(ArrayList<Trip> trips, ArrayList<Bus> buses) {
         Scanner input = new Scanner(System.in);
         String strInput, priceInput, durationInput, yearInput, monthInput, dayInput, hourInput, minuteInput;
 
         System.out.print("Trip code: ");
         strInput = input.nextLine();
-        while (!tripCodeSecurity(trips ,strInput)) {
+        while (!createTripCodeSecurity(trips ,strInput)) {
             System.out.print("Invalid input, trip code: ");
             strInput = input.nextLine();
         }
@@ -296,7 +327,7 @@ public class Admin extends User {
                     listBuses(buses);
                     System.out.print("License plate of the bus: ");
                     strInput = input.nextLine();
-                    while (!licensePlateSecurity(buses, strInput)) {
+                    while (!checkIfLicensePlateExists(buses, strInput)) {
                         System.out.print("Invalid input, license plate of the bus: ");
                         strInput = input.nextLine();
                     }
@@ -304,7 +335,7 @@ public class Admin extends User {
                     newTripBuses.add(buses.get(index));
                     break;
                 case 2:
-                    newTripBuses.add(createBus());
+                    newTripBuses.add(createBus(buses));
                     break;
                 default:
                     System.out.println("Invalid operation");
@@ -313,9 +344,8 @@ public class Admin extends User {
 
         ArrayList<Coment> coments = new ArrayList<>();
         Trip trip = new Trip(code, origin, destiny, price, duration, date, newTripBuses, coments);
-        System.out.println(trip);
+        trips.add(trip);
         System.out.println("Operation sucefull");
-        return trip;
     }
 
     public void deleteTrip(ArrayList<Trip> trips) {
@@ -323,7 +353,7 @@ public class Admin extends User {
         System.out.print("Code of Trip to delete: ");
         Scanner input = new Scanner(System.in);
         String strInput = input.nextLine();
-        while (!tripCodeSecurity(trips, strInput)) {
+        while (!acessTripCodeSecurity(trips, strInput)) {
             System.out.print("Invalid input, code of trip do delete: ");
             strInput = input.nextLine();
         }
@@ -348,7 +378,7 @@ public class Admin extends User {
 
         System.out.print("Code of trip to modify: ");
         strInput = input.nextLine();
-        while(!tripCodeSecurity(trips, strInput)) {
+        while(!acessTripCodeSecurity(trips, strInput)) {
             System.out.print("Invalid input, code of trip to modify: ");
             strInput = input.nextLine();
         }
@@ -550,18 +580,27 @@ public class Admin extends User {
         System.out.println("Operation sucefull");
     }
 
-    public Bus createBus() {
-        System.out.print("Bus license plate: ");
+    public Bus createBus(ArrayList<Bus> buses) {
         Scanner input = new Scanner(System.in);
-        String licensePlate = input.nextLine();
+        String licensePlate, capacityInput;
+        Bus bus;
+
+        System.out.print("Bus license plate: ");
+        licensePlate = input.nextLine();
+        while (checkIfLicensePlateExists(buses, licensePlate)) {
+            System.out.print("License plate already exists, bus license plate: ");
+            licensePlate = input.nextLine();
+        }
+
         System.out.print("Bus capacity: ");
-        String capacityInput = input.nextLine();
+        capacityInput = input.nextLine();
         while (!generalSecurity(capacityInput)) {
             System.out.print("Invalid input, bus capacity: ");
             capacityInput = input.nextLine();
         }
         int capacity = Integer.parseInt(capacityInput);
-        Bus bus = new Bus(licensePlate, capacity);
+
+        bus = new Bus(licensePlate, capacity);
         return bus;
     }
 
@@ -571,7 +610,7 @@ public class Admin extends User {
 
         System.out.print("License Plate of bus to delete: ");
         licensePlate = input.nextLine();
-        while(!licensePlateSecurity(buses, licensePlate)) {
+        while(!checkIfLicensePlateExists(buses, licensePlate)) {
             System.out.print("Invalid input, license plate of bus to modify: ");
             licensePlate = input.nextLine();
         }
@@ -595,8 +634,8 @@ public class Admin extends User {
 
         System.out.print("License plate of bus to modify: ");
         strInput = input.nextLine();
-        while (!licensePlateSecurity(buses, strInput)) {
-            System.out.print("Invalid input, license plate of bus to modify: ");
+        while (!checkIfLicensePlateExists(buses, strInput)) {
+            System.out.print("License plate doesn't exist, license plate of bus to modify: ");
             strInput = input.nextLine();
         }
         index = indexOfBus(buses, strInput);

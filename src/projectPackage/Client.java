@@ -18,7 +18,7 @@ public abstract class Client extends User{
     public abstract void listAvaiableTrips(ArrayList<Trip> trips);
     public abstract double reserveTrip(ArrayList<Trip> trips);
     public abstract void listReserves();
-    public abstract void cancelReserve();
+    public abstract double cancelReserve();
     public abstract void addCommentTrip(ArrayList<Trip> trips);
     public abstract void listCommentsTrip(ArrayList<Coment> coments);
     public abstract double leaveWaitingList(ArrayList<Trip> trips);

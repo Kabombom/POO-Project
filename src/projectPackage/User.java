@@ -1,6 +1,7 @@
 package projectPackage;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class User {
     private String name;
@@ -85,8 +86,17 @@ public class User {
         }
     }
 
+    public boolean createTripCodeSecurity(ArrayList<Trip> trips, String strInput) {
+        try {
+            int code = Integer.parseInt(strInput);
+            return !(code <= 0 || checkIfTripCodeExists(trips, code));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     //Protects the trip code given by the user from bad inputs (char, string, etc) and invalid trip codes (already existing ones)
-    public boolean tripCodeSecurity(ArrayList<Trip> trips, String strInput) {
+    public boolean acessTripCodeSecurity(ArrayList<Trip> trips, String strInput) {
         try {
             int code = Integer.parseInt(strInput);
             return !(code <= 0 || !checkIfTripCodeExists(trips, code));
@@ -128,57 +138,51 @@ public class User {
     //Protects the hourd of date given by the user from bad inputs (char, string, etc) and invalid hours
     public boolean dateHourSecurity(String strInput) {
         try {
-            int input = Integer.parseInt(strInput);
-            return !(input <= 0 || input > 23);
+            int hour = Integer.parseInt(strInput);
+            return !(hour <= 0 || hour > 23);
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    //Protects the day of date given by the user from bad inputs (char, string, etc) and invalid days
     public boolean dateDaySecurity(String strInput, int month) {
+        Calendar calendar = Calendar.getInstance();
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
         try {
-            int input = Integer.parseInt(strInput);
+            int day = Integer.parseInt(strInput);
             if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
-                return !(input <= 0 || input > 31);
+                return !(day <= 0 || day > 31 || day <= currentDay);
             else if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11 )
-                return  !(input <= 0 || input > 30);
+                return  !(day <= 0 || day > 30);
         } catch (NumberFormatException e) {
             return false;
         }
         return false;
     }
 
-    //Protects the month of date given by the user from bad inputs (char, string, etc) and invalid months
     public boolean dateMonthSecurity(String strInput) {
+        Calendar calendar = Calendar.getInstance();
+        //Calendar month indexes like an array
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
         try {
             int input = Integer.parseInt(strInput);
-            return !(input <= 0 || input > 12);
+            return !((input <= 0 || input > 12) || input < currentMonth);
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    //Protects the year of date given by the user from bad inputs (char, string, etc)
     public boolean dateYearSecurity(String strInput) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
         try {
             int input = Integer.parseInt(strInput);
-            return !(input <= 2015);
+            return !(input < currentYear);
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    //Checks if the license plate given by the user already exists in the buses of the Travel Agency.
-    public boolean licensePlateSecurity(ArrayList<Bus> buses, String strInput) {
-        for (Bus bus : buses) {
-            if (bus.getLicensePlate().equals(strInput))
-                return true;
-        }
-        return false;
-    }
-
-    //Protects the seat of date from bad inputs (char, string, etc)
     public boolean seatReserveSecurity(Bus bus, String strInput) {
         try {
             int seatNumber = Integer.parseInt(strInput);
@@ -189,7 +193,6 @@ public class User {
         }
     }
 
-    //Protects the trip rating given by the user from bad inputs (char, string, etc) and invalid ratings.
     public boolean ratingSecurity(String strInput) {
         try {
             double rating = Double.parseDouble(strInput);
@@ -199,7 +202,6 @@ public class User {
         }
     }
 
-    //When searching a user or creating a new one we need to check if the nif already exists
     public boolean checkIfNifExists(ArrayList<User> users, String nif) {
         for (User user : users) {
             if (user.getNif().equals(nif))
@@ -235,6 +237,15 @@ public class User {
         return true;
     }
 
+    //Checks if the license plate given by the user already exists in the buses of the Travel Agency.
+    public boolean checkIfLicensePlateExists(ArrayList<Bus> buses, String strInput) {
+        for (Bus bus : buses) {
+            if (bus.getLicensePlate().equals(strInput))
+                return true;
+        }
+        return false;
+    }
+
     //Returns the index of a client in an ArrayList
     public int indexOfClient(ArrayList<User> users, String nif) {
         int i;
@@ -263,5 +274,20 @@ public class User {
                 return i;
         }
         return i;
+    }
+
+    public int compareDates(Calendar calendar, Date date) {
+        int currentYear = calendar.get(Calendar.YEAR);
+        //Months indexed like array
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        int tripYear = date.getYear();
+        int tripMonth = date.getMonth();
+        int tripDay = date.getDay();
+
+        int currentDate = currentYear * 10000 + currentMonth *  100 + currentDay;
+        int tripDate = tripYear * 10000 + tripMonth *  100 + tripDay;
+
+        return tripDate - currentDate;
     }
 }
