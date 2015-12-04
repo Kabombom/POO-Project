@@ -4,10 +4,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO estatisticas
+//TODO estatisticas VER CADERNO
 //TODO verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
 //METER NAS SEGURANÇAS UMA FORMA DE SAIR DOS INPUTS
 //TODO começar a implementar ficheiros
+//TODO javadocs
+//TODO relatorio
 
 public class Agency implements Ficheiro, Menu{
     private ArrayList<User> users = new ArrayList<>();
@@ -278,13 +280,11 @@ public class Agency implements Ficheiro, Menu{
                     break;
                 case 2:
                     profitToAdd += client.reserveTrip(trips);
-                    System.out.println(profitToAdd);
                     this.setProfit(profitToAdd);
                     System.out.println();
                     break;
                 case 3:
                     profitToAdd -= client.cancelReserve();
-                    System.out.println(profitToAdd);
                     this.setProfit(profitToAdd);
                     System.out.println();
                     break;
@@ -337,12 +337,11 @@ public class Agency implements Ficheiro, Menu{
         Agency agencia = new Agency(users, trips, buses, profit);
 
         Date date = new Date(1 ,1 ,4 ,12 ,2015);
-        ArrayList<Coment> coments = new ArrayList<>();
         Bus bus = new Bus("1", 2);
         Bus bus2 = new Bus("2", 2);
         buses.add(bus);
         buses.add(bus2);
-        Trip trip = new Trip(1, "oi", "adeus", 1, 1, date, buses, coments);
+        Trip trip = new Trip(1, "oi", "adeus", 1, 1, date, buses);
         trips.add(trip);
         ArrayList<Reserve> reserves = new ArrayList<>();
         ArrayList<Reserve> reserves2 = new ArrayList<>();
@@ -353,14 +352,14 @@ public class Agency implements Ficheiro, Menu{
         ArrayList<Reserve> reserves7 = new ArrayList<>();
         ArrayList<Reserve> reserves8 = new ArrayList<>();
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
-        Premium premium1 = new Premium("Machado1", "2", "2", "mail2", "324342", "isto2", 2, reserves);
-        Premium premium2 = new Premium("Machado2", "3", "3", "mail3", "324343", "isto3", 2, reserves2);
-        Premium premium3 = new Premium("Machado3", "4", "4", "mail4", "324344", "isto4", 2, reserves3);
-        Premium premium4 = new Premium("Machad4", "5", "5", "mail5", "324345", "isto5", 2, reserves4);
-        Premium premium5 = new Premium("Machado5", "6", "6", "mail6", "324346", "isto6", 2, reserves5);
-        Premium premium6 = new Premium("Machado6", "7", "7", "mail7", "324347", "isto7", 2, reserves6);
-        Premium premium7 = new Premium("Machado7", "8", "8", "mail8", "324348", "isto8", 2, reserves7);
-        Premium premium8 = new Premium("Machado8", "9", "9", "mail9", "324349", "isto9", 2, reserves8);
+        Premium premium1 = new Premium("Machado1", "2", "2", "mail2", "324342", "isto2", 2);
+        Premium premium2 = new Premium("Machado2", "3", "3", "mail3", "324343", "isto3", 2);
+        Premium premium3 = new Premium("Machado3", "4", "4", "mail4", "324344", "isto4", 2);
+        Premium premium4 = new Premium("Machad4", "5", "5", "mail5", "324345", "isto5", 2);
+        Premium premium5 = new Premium("Machado5", "6", "6", "mail6", "324346", "isto6", 2);
+        Premium premium6 = new Premium("Machado6", "7", "7", "mail7", "324347", "isto7", 2);
+        Premium premium7 = new Premium("Machado7", "8", "8", "mail8", "324348", "isto8", 2);
+        Premium premium8 = new Premium("Machado8", "9", "9", "mail9", "324349", "isto9", 2);
 
         users.add(admin);
         users.add(premium1);

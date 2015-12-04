@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class Premium extends Client {
 
-    public Premium(String name, String nif, String address, String email, String phone, String password, int type, ArrayList<Reserve> clientReserves) {
-        super(name, nif, address, email, phone, password, type, clientReserves);
+    public Premium(String name, String nif, String address, String email, String phone, String password, int type) {
+        super(name, nif, address, email, phone, password, type);
     }
 
     public void listAvaiableTrips(ArrayList<Trip> trips) {
@@ -30,6 +30,8 @@ public class Premium extends Client {
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
+        Calendar calendar = Calendar.getInstance();
+        int currentMonth = calendar.get(Calendar.MONTH);
 
         listAvaiableTrips(trips);
         System.out.print("Code of trip to reserve: ");
@@ -81,9 +83,12 @@ public class Premium extends Client {
                     System.out.print("Invalid input, seat number in the bus to reserve: ");
                     strInput = input.nextLine();
                 }
-
                 int seatNumber = Integer.parseInt(strInput) - 1;
                 firstBus.addTakenSeat(seatNumber);
+
+                trip.getSalesByMonth()[currentMonth]++;
+                this.getTripsBoughtByMonth()[currentMonth]++;
+
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
                 return payment(trip);
@@ -119,7 +124,8 @@ public class Premium extends Client {
         int code, tripCode, differenceOfDates;
         double profit;
         //Getting current date
-        Calendar rightNow = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
+        int currentMonth = calendar.get(Calendar.MONTH);
 
         String strInput;
         Scanner input = new Scanner(System.in);
@@ -146,8 +152,8 @@ public class Premium extends Client {
             if (tripCode == code) {
                 firstBus = trip.getBuses().get(0);
                 waitingList = trip.getWaitingList();
-                differenceOfDates = compareDates(rightNow, trip.getDate());
-                System.out.println(differenceOfDates);
+                differenceOfDates = compareDates(calendar, trip.getDate());
+
                 if (differenceOfDates < 2) {
                     profit = payment(trip);
                 } else {
@@ -158,6 +164,9 @@ public class Premium extends Client {
                     for (User user : waitingList)
                         reserve.getTrip().notifyWaitingList();
                 }
+
+                trip.getSalesByMonth()[currentMonth]--;
+                this.getTripsBoughtByMonth()[currentMonth]--;
 
                 firstBus.deleteTakenSeat(reserve.getSeatNumber());
                 reserves.remove(i);

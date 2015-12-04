@@ -17,7 +17,6 @@ public class Admin extends User {
         int type;
         String name, nif, address, email, phone, password, typeInput;
         Scanner input = new Scanner(System.in);
-        ArrayList<Reserve> reserves = new ArrayList<>();
 
         System.out.print("Client name: ");
         name = input.nextLine();
@@ -47,8 +46,9 @@ public class Admin extends User {
         password = input.nextLine();
 
         System.out.print("[1] --> Admin\n" +
-                         "[2] --> Premium" +
-                         "[3] --> Regular");
+                         "[2] --> Premium\n" +
+                         "[3] --> Regular\n" +
+                         "Client type: ");
         typeInput = input.nextLine();
         while (!typeSecurity(typeInput)) {
             System.out.print("Invalid type, ");
@@ -62,12 +62,12 @@ public class Admin extends User {
             System.out.println("Operation sucefull");
         }
         else if (type == 2) {
-            Premium premium = new Premium(name, nif, address, email, phone, password, type, reserves);
+            Premium premium = new Premium(name, nif, address, email, phone, password, type);
             users.add(premium);
             System.out.println("Operation sucefull");
         }
         else if (type == 3) {
-            Regular regular = new Regular(name, nif, address, email, phone, password, type, reserves);
+            Regular regular = new Regular(name, nif, address, email, phone, password, type);
             users.add(regular);
             System.out.println("Operation sucefull");
         }
@@ -227,7 +227,9 @@ public class Admin extends User {
     //Mudar as strings de inputs
     public void createTrip(ArrayList<Trip> trips, ArrayList<Bus> buses) {
         Scanner input = new Scanner(System.in);
-        String strInput, priceInput, durationInput, yearInput, monthInput, dayInput, hourInput, minuteInput;
+        int code, year, month, day, hour, minute, numBuses;
+        double price, duration;
+        String strInput;
 
         System.out.print("Trip code: ");
         strInput = input.nextLine();
@@ -235,7 +237,7 @@ public class Admin extends User {
             System.out.print("Invalid input, trip code: ");
             strInput = input.nextLine();
         }
-        int code = Integer.parseInt(strInput);
+        code = Integer.parseInt(strInput);
 
         System.out.print("Trip origin: ");
         String origin = input.nextLine();
@@ -244,70 +246,70 @@ public class Admin extends User {
         String destiny = input.nextLine();
 
         System.out.print("Trip price: ");
-        priceInput = input.nextLine();
-        while (!tripPriceSecurity(priceInput)) {
+        strInput = input.nextLine();
+        while (!tripPriceSecurity(strInput)) {
             System.out.print("Invalid input, trip price: ");
-            priceInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        double price = Double.parseDouble(priceInput);
+        price = Double.parseDouble(strInput);
 
         System.out.print("Trip duration: ");
-        durationInput = input.nextLine();
-        while (!tripPriceSecurity(durationInput)) {
+        strInput = input.nextLine();
+        while (!tripPriceSecurity(strInput)) {
             System.out.print("Invalid input, trip duration: ");
-            durationInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        double duration = Double.parseDouble(durationInput);
+        duration = Double.parseDouble(strInput);
 
         System.out.print("Trip new year: ");
-        yearInput = input.nextLine();
-        while (!dateYearSecurity(yearInput)) {
+        strInput = input.nextLine();
+        while (!dateYearSecurity(strInput)) {
             System.out.print("Invalid input, trip new year: ");
-            yearInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        int year = Integer.parseInt(yearInput);
+        year = Integer.parseInt(strInput);
 
         System.out.print("Trip new month: ");
-        monthInput = input.nextLine();
-        while (!dateMonthSecurity(monthInput)) {
+        strInput = input.nextLine();
+        while (!dateMonthSecurity(strInput)) {
             System.out.print("Invalid input, trip new month: ");
-            monthInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        int month = Integer.parseInt(monthInput);
+        month = Integer.parseInt(strInput);
 
         System.out.print("Trip new day: ");
-        dayInput = input.nextLine();
-        while (!dateDaySecurity(dayInput, month)) {
+        strInput = input.nextLine();
+        while (!dateDaySecurity(strInput, month)) {
             System.out.print("Invalid input, trip new day: ");
-            dayInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        int day = Integer.parseInt(dayInput);
+        day = Integer.parseInt(strInput);
 
         System.out.print("Trip new hour: ");
-        hourInput = input.nextLine();
-        while (!dateHourSecurity(hourInput)) {
+        strInput = input.nextLine();
+        while (!dateHourSecurity(strInput)) {
             System.out.print("Invalid input, trip new hour: ");
-            hourInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        int hour = Integer.parseInt(hourInput);
+        hour = Integer.parseInt(strInput);
 
         System.out.print("Trip new minute: ");
-        minuteInput = input.nextLine();
-        while (!dateMinuteSecurity(minuteInput)) {
+        strInput = input.nextLine();
+        while (!dateMinuteSecurity(strInput)) {
             System.out.print("Invalid input, trip new minute: ");
-            minuteInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        int minute = Integer.parseInt(minuteInput);
+        minute = Integer.parseInt(strInput);
 
         Date date = new Date(minute, hour, day, month, year);
 
         System.out.print("Number of buses used: ");
-        String numBusesInput = input.nextLine();
-        while (!generalSecurity(numBusesInput)) {
+        strInput = input.nextLine();
+        while (!generalSecurity(strInput)) {
             System.out.print("Invalid input, number of buses used: ");
-            numBusesInput = input.nextLine();
+            strInput = input.nextLine();
         }
-        int numBuses = Integer.parseInt(numBusesInput);
+        numBuses = Integer.parseInt(strInput);
         ArrayList<Bus> newTripBuses = new ArrayList<>(numBuses);
 
         for (int i = 0; i < numBuses; i++) {
@@ -332,6 +334,7 @@ public class Admin extends User {
                         strInput = input.nextLine();
                     }
                     int index = indexOfBus(buses, strInput);
+
                     newTripBuses.add(buses.get(index));
                     break;
                 case 2:
@@ -342,8 +345,7 @@ public class Admin extends User {
             }
         }
 
-        ArrayList<Coment> coments = new ArrayList<>();
-        Trip trip = new Trip(code, origin, destiny, price, duration, date, newTripBuses, coments);
+        Trip trip = new Trip(code, origin, destiny, price, duration, date, newTripBuses);
         trips.add(trip);
         System.out.println("Operation sucefull");
     }
@@ -688,6 +690,82 @@ public class Admin extends User {
     public void listBuses(ArrayList<Bus> buses) {
         for (Bus bus : buses) {
             System.out.println(bus);
+        }
+    }
+
+    public void mostSoldTripInMonth(ArrayList<Trip> trips) {
+        int month;
+        int mostSells = 0;
+        String strInput;
+        Scanner input = new Scanner(System.in);
+        Trip mostSold = null;
+
+        System.out.print("Month: ");
+        strInput = input.nextLine();
+        while (!dateMonthSecurity(strInput)) {
+            System.out.print("Invalid input, month:");
+            strInput = input.nextLine();
+        }
+        month = Integer.parseInt(strInput) - 1;
+
+        for (Trip trip : trips) {
+            int salesOfMonth = trip.getSalesByMonth()[month];
+            if (salesOfMonth > mostSells) {
+                mostSells = salesOfMonth;
+                mostSold = trip;
+            }
+        }
+        if (mostSold != null)
+            System.out.println("The most sold trip was " + mostSold + " with " + mostSells + " trips sold");
+    }
+
+    public void clientMostTripsBoughtInMonth(ArrayList<User> users) {
+        int month;
+        int mostBought = 0;
+        String strInput;
+        Scanner input = new Scanner(System.in);
+        Client mostTripsBought = null;
+
+        System.out.print("Month: ");
+        strInput = input.nextLine();
+        while (!dateMonthSecurity(strInput)) {
+            System.out.print("Invalid input, month:");
+            strInput = input.nextLine();
+        }
+        month = Integer.parseInt(strInput) - 1;
+
+        for (User user : users) {
+            if (user.getType() == 2 || user.getType() == 3) {
+                Client client = (Client) user;
+                int tripsBought = client.getTripsBoughtByMonth()[month];
+
+                if (tripsBought > mostBought) {
+                    mostTripsBought = client;
+                    mostBought = tripsBought;
+                }
+            }
+        }
+
+        if (mostTripsBought != null)
+            System.out.println("The user that most trips bought is " + mostTripsBought + " with " + mostBought + " trips bought");
+    }
+
+    public void tripsNotSoldInMonth(ArrayList<Trip> trips) {
+        int month;
+        String strInput;
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Month: ");
+        strInput = input.nextLine();
+        while (!dateMonthSecurity(strInput)) {
+            System.out.print("Invalid input, month:");
+            strInput = input.nextLine();
+        }
+        month = Integer.parseInt(strInput) - 1;
+
+        for (Trip trip : trips) {
+            if (trip.getSalesByMonth()[month] == 0)
+                System.out.println(trip);
         }
     }
 }

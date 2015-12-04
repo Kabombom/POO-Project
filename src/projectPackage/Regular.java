@@ -6,8 +6,9 @@ import java.util.Scanner;
 
 public class Regular extends Client{
 
-    public Regular(String name, String nif, String address, String email, String phone, String password, int type, ArrayList<Reserve> clientReserves) {
-        super(name, nif, address, email, phone, password, type, clientReserves);
+    public Regular(String name, String nif, String address, String email, String phone, String password, int type) {
+        super(name, nif, address, email, phone, password, type);
+        super.clientReserves = new ArrayList<>();
     }
 
     public void listAvaiableTrips(ArrayList<Trip> trips) {
@@ -28,6 +29,8 @@ public class Regular extends Client{
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
+        Calendar calendar = Calendar.getInstance();
+        int currentMonth = calendar.get(Calendar.MONTH);
 
         listAvaiableTrips(trips);
         System.out.print("Code of trip to reserve: ");
@@ -79,9 +82,12 @@ public class Regular extends Client{
                     System.out.print("Invalid input, seat number in the bus to reserve: ");
                     strInput = input.nextLine();
                 }
-
                 int seatNumber = Integer.parseInt(strInput) - 1;
                 firstBus.addTakenSeat(seatNumber);
+
+                trip.getSalesByMonth()[currentMonth]++;
+                this.getTripsBoughtByMonth()[currentMonth]++;
+
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
                 return payment(trip);
@@ -117,7 +123,8 @@ public class Regular extends Client{
         int code, tripCode, differenceOfDates;
         double profit;
         //Getting current date
-        Calendar rightNow = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
+        int currentMonth = calendar.get(Calendar.MONTH);
 
         String strInput;
         Scanner input = new Scanner(System.in);
@@ -144,11 +151,10 @@ public class Regular extends Client{
             if (tripCode == code) {
                 firstBus = trip.getBuses().get(0);
                 waitingList = trip.getWaitingList();
-                differenceOfDates = compareDates(rightNow, trip.getDate());
-                System.out.println(differenceOfDates);
+                differenceOfDates = compareDates(calendar, trip.getDate());
 
-                if (differenceOfDates <= 7) {
-                    profit = payment(trip) * 0.5;
+                if (differenceOfDates < 2) {
+                    profit = payment(trip);
                 } else {
                     profit = 0;
                 }
@@ -157,6 +163,9 @@ public class Regular extends Client{
                     for (User user : waitingList)
                         reserve.getTrip().notifyWaitingList();
                 }
+
+                trip.getSalesByMonth()[currentMonth]--;
+                this.getTripsBoughtByMonth()[currentMonth]--;
 
                 firstBus.deleteTakenSeat(reserve.getSeatNumber());
                 reserves.remove(i);

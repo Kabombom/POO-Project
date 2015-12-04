@@ -1,27 +1,30 @@
 package projectPackage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Trip {
     //Atributes
     private int code;
-    private String origin, destiny;
+    private int[] salesByMonth;
     private double price, duration;
+    private String origin, destiny;
     private Date date;
     private ArrayList<Bus> buses;
     private ArrayList<Coment> coments;
     private ArrayList<User> waitingList;
 
-    public Trip(int code, String origin, String destiny, double price, double duration, Date date, ArrayList<Bus> buses, ArrayList<Coment> coments) {
+    public Trip(int code, String origin, String destiny, double price, double duration, Date date, ArrayList<Bus> buses) {
         this.code = code;
         this.origin = origin;
         this.destiny = destiny;
         this.price = price;
         this.duration = duration;
+        this.salesByMonth = new int[12];
         this.date = date;
         this.buses = buses;
-        this.coments = coments;
         this.waitingList = new ArrayList<>();
+        this.coments = new ArrayList<>();
     }
 
     //Getters and Setters
@@ -43,6 +46,8 @@ public class Trip {
     public double getDuration() { return duration; }
     public void setDuration(double duration) { this.duration = duration; }
 
+    public int[] getSalesByMonth() { return salesByMonth; }
+    public void setSalesByMonth(int[] salesByMonth) { this.salesByMonth = salesByMonth; }
 
     public ArrayList<Bus> getBuses() { return buses; }
     public void setBuses(ArrayList<Bus> buses) { this.buses = buses; }
@@ -57,13 +62,15 @@ public class Trip {
     public String toString() {
         return "Trip{" +
                 "code=" + code +
-                ", origin='" + origin + '\'' +
-                ", destiny='" + destiny + '\'' +
+                ", salesByMonth=" + Arrays.toString(salesByMonth) +
                 ", price=" + price +
                 ", duration=" + duration +
+                ", origin='" + origin + '\'' +
+                ", destiny='" + destiny + '\'' +
                 ", date=" + date +
                 ", buses=" + buses +
                 ", coments=" + coments +
+                ", waitingList=" + waitingList +
                 '}';
     }
 
@@ -71,4 +78,5 @@ public class Trip {
         System.out.println("Dear clients of Costa & Machado the " + this + " is now avaiable\n" +
                            "If you wish to complete your reservation proceed with the payment, the first client to pay gets the reservation.");
     }
+
 }
