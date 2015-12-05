@@ -20,13 +20,13 @@ public abstract class Client extends User{
     public int[] getTripsBoughtByMonth() { return tripsBoughtByMonth; }
     public void setTripsBoughtByMonth(int[] tripsBoughtByMonth) { this.tripsBoughtByMonth = tripsBoughtByMonth; }
 
-    public abstract void listAvaiableTrips(ArrayList<Trip> trips);
-    public abstract double reserveTrip(ArrayList<Trip> trips);
+    public abstract void listAvaiableTrips(Agency agency);
+    public abstract double reserveTrip(Agency agency);
     public abstract void listReserves();
     public abstract double cancelReserve();
-    public abstract void addCommentTrip(ArrayList<Trip> trips);
-    public abstract void listCommentsTrip(ArrayList<Coment> coments);
-    public abstract double leaveWaitingList(ArrayList<Trip> trips);
+    public abstract void addCommentTrip(Agency agency);
+    public abstract void listCommentsTrip(Agency agency);
+    public abstract double leaveWaitingList(Agency agency);
     public abstract double payment(Trip trip);
 
 }

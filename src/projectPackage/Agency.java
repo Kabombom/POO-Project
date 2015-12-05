@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO estatisticas VER CADERNO
 //TODO verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
 //METER NAS SEGURANÇAS UMA FORMA DE SAIR DOS INPUTS
 //TODO começar a implementar ficheiros
@@ -107,8 +106,11 @@ public class Agency implements Ficheiro, Menu{
         return null;
     }
 
-    public User login(ArrayList<User> users) {
+    public User login(Agency agency) {
+        ArrayList<User> users = agency.getUsers();
+
         Scanner input = new Scanner(System.in);
+
         System.out.println("Welcome to COSTA & MACHADO travel agency");
         System.out.println("To login press 1\nTo leave press 0");
         String choiceInput = input.nextLine();
@@ -117,8 +119,6 @@ public class Agency implements Ficheiro, Menu{
             choiceInput = input.nextLine();
         }
         int choice = Integer.parseInt(choiceInput);
-        if (choice == 0)
-            return null;
 
         switch (choice) {
             case 0:
@@ -149,7 +149,8 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public void adminMenu(ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses, Admin admin) {
+    public void adminMenu(Agency agency, Admin admin) {
+        ArrayList<Bus> buses = agency.getBuses();
         String strInput;
         int choice;
         Scanner input = new Scanner(System.in);
@@ -182,64 +183,64 @@ public class Agency implements Ficheiro, Menu{
                 case 0:
                     return;
                 case 1:
-                    admin.createClient(users);
-                    admin.listClients(users);
+                    admin.createUser(agency);
+                    admin.listUsers(agency);
                     System.out.println();
                     break;
                 case 2:
-                    admin.modifyClient(users);
-                    admin.listClients(users);
+                    admin.modifyUser(agency);
+                    admin.listUsers(agency);
                     System.out.println();
                     break;
                 case 3:
-                    admin.deleteUser(users);
-                    admin.listClients(users);
+                    admin.deleteUser(agency);
+                    admin.listUsers(agency);
                     System.out.println();
                     break;
                 case 4:
-                    admin.listClients(users);
+                    admin.listUsers(agency);
                     System.out.println();
                     break;
                 case 5:
-                    admin.createTrip(trips, buses);
-                    admin.listTrips(trips);
+                    admin.createTrip(agency);
+                    admin.listTrips(agency);
                     System.out.println();
                     break;
                 case 6:
-                    admin.modifyTrip(trips, buses);
-                    admin.listTrips(trips);
+                    admin.modifyTrip(agency);
+                    admin.listTrips(agency);
                     System.out.println();
                     break;
                 case 7:
-                    admin.deleteTrip(trips);
-                    admin.listTrips(trips);
+                    admin.deleteTrip(agency);
+                    admin.listTrips(agency);
                     System.out.println();
                     break;
                 case 8:
-                    admin.listTrips(trips);
+                    admin.listTrips(agency);
                     System.out.println();
                     break;
                 case 9:
-                    buses.add(admin.createBus(buses));
-                    admin.listBuses(buses);
+                    buses.add(admin.createBus(agency));
+                    admin.listBuses(agency);
                     System.out.println();
                     break;
                 case 10:
-                    admin.modifyBus(buses);
-                    admin.listBuses(buses);
+                    admin.modifyBus(agency);
+                    admin.listBuses(agency);
                     System.out.println();
                     break;
                 case 11:
-                    admin.deleteBus(buses);
-                    admin.listBuses(buses);
+                    admin.deleteBus(agency);
+                    admin.listBuses(agency);
                     System.out.println();
                     break;
                 case 12:
-                    admin.listBuses(buses);
+                    admin.listBuses(agency);
                     System.out.println();
                     break;
                 case 13:
-                    menu(users, trips, buses);
+                    menu(agency);
                     break;
                 default:
                     System.out.println("Invalid operation");
@@ -247,7 +248,7 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public void clientMenu(ArrayList<Trip> trips, Client client) {
+    public void clientMenu(Agency agency, Client client) {
         String strInput;
         int choice;
         double profitToAdd = this.getProfit();
@@ -275,17 +276,17 @@ public class Agency implements Ficheiro, Menu{
                 case 0:
                     return;
                 case 1:
-                    client.listAvaiableTrips(trips);
+                    client.listAvaiableTrips(agency);
                     System.out.println();
                     break;
                 case 2:
-                    profitToAdd += client.reserveTrip(trips);
-                    this.setProfit(profitToAdd);
+                    profitToAdd += client.reserveTrip(agency);
+                    agency.setProfit(profitToAdd);
                     System.out.println();
                     break;
                 case 3:
                     profitToAdd -= client.cancelReserve();
-                    this.setProfit(profitToAdd);
+                    agency.setProfit(profitToAdd);
                     System.out.println();
                     break;
                 case 4:
@@ -293,16 +294,16 @@ public class Agency implements Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 5:
-                    client.addCommentTrip(trips);
+                    client.addCommentTrip(agency);
                     System.out.println();
                     break;
                 case 6:
-                    client.leaveWaitingList(trips);
+                    client.leaveWaitingList(agency);
                     System.out.println();
                     break;
                 case 7:
                     System.out.println();
-                    menu(this.getUsers(), this.getTrips(), this.getBuses());
+                    menu(agency);
                     break;
                 default:
                     System.out.println("Invalid operation");
@@ -310,21 +311,45 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public void menu(ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses) {
+    public void menu(Agency agency) {
+        ArrayList<User> users = agency.getUsers();
+        ArrayList<Trip> trips = agency.getTrips();
+        ArrayList<Bus> buses = agency.getBuses();
+
         Client client;
         Admin admin;
-        User user = login(users);
+        User user = login(agency);
 
         if (user.getType() == 2 || user.getType() == 3) {
             client = (Client) user;
             while(true) {
-                clientMenu(trips, client);
+                clientMenu(agency, client);
+
+                for (User test : users) {
+                    System.out.println(test);
+                }
+                for (Trip test2 : trips) {
+                    System.out.println(test2);
+                }
+                for (Bus test3 : buses) {
+                    System.out.println(test3);
+                }
             }
         }
         else {
             admin = (Admin) user;
             while (true) {
-                adminMenu(users, trips, buses, admin);
+                adminMenu(agency, admin);
+                for (User test : users) {
+                    System.out.println(test);
+                }
+                for (Trip test2 : trips) {
+                    System.out.println(test2);
+                }
+                for (Bus test3 : buses) {
+                    System.out.println(test3);
+                }
+
             }
         }
     }
@@ -370,6 +395,6 @@ public class Agency implements Ficheiro, Menu{
         users.add(premium6);
         users.add(premium7);
         users.add(premium8);
-        agencia.menu(users, trips, buses);
+        agencia.menu(agencia);
     }
 }

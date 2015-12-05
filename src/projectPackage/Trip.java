@@ -1,5 +1,6 @@
 package projectPackage;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -79,4 +80,15 @@ public class Trip {
                            "If you wish to complete your reservation proceed with the payment, the first client to pay gets the reservation.");
     }
 
+    public double averageRating() {
+        ArrayList<Coment> coments =  this.getComents();
+        double average = 0;
+        int total = 0;
+
+        for (Coment coment : coments) {
+            average += coment.getScore();
+            total++;
+        }
+        return average/total;
+    }
 }

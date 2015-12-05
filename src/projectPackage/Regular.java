@@ -11,7 +11,9 @@ public class Regular extends Client{
         super.clientReserves = new ArrayList<>();
     }
 
-    public void listAvaiableTrips(ArrayList<Trip> trips) {
+    public void listAvaiableTrips(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+
         System.out.println("Avaiable trips:");
         for (Trip trip: trips) {
             Bus bus = trip.getBuses().get(0);
@@ -25,14 +27,16 @@ public class Regular extends Client{
         }
     }
 
-    public double reserveTrip(ArrayList<Trip> trips) {
+    public double reserveTrip(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
 
-        listAvaiableTrips(trips);
+        listAvaiableTrips(agency);
         System.out.print("Code of trip to reserve: ");
         strInput = input.nextLine();
         while (!acessTripCodeSecurity(trips, strInput)) {
@@ -101,7 +105,7 @@ public class Regular extends Client{
             System.out.println(reserve);
     }
 
-    public boolean checksIfReserveCodeExists(int code, ArrayList<Reserve> reserves) {
+    public boolean checksIfReserveCodeExists(ArrayList<Reserve> reserves, int code) {
         for (Reserve reserve : reserves) {
             if (code == reserve.getTrip().getCode())
                 return true;
@@ -109,10 +113,10 @@ public class Regular extends Client{
         return false;
     }
 
-    public boolean cancelReserveCodeSecurity(String strInput, ArrayList<Reserve> reserves) {
+    public boolean cancelReserveCodeSecurity(ArrayList<Reserve> reserves, String strInput) {
         try {
             int code = Integer.parseInt(strInput);
-            return checksIfReserveCodeExists(code, reserves);
+            return checksIfReserveCodeExists(reserves, code);
 
         } catch (NumberFormatException e) {
             return false;
@@ -137,7 +141,7 @@ public class Regular extends Client{
         this.listReserves();
         System.out.print("Trip code of the reserve to cancel: ");
         strInput = input.nextLine();
-        while(!cancelReserveCodeSecurity(strInput, reserves)) {
+        while(!cancelReserveCodeSecurity(reserves, strInput)) {
             System.out.print("Invalid input, trip code of the reserve to cancel: ");
             strInput = input.nextLine();
         }
@@ -176,13 +180,14 @@ public class Regular extends Client{
         return 0;
     }
 
-    public void addCommentTrip(ArrayList<Trip> trips) {
-        String strInput, comm;
-        double rating;
+    public void addCommentTrip(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
         int code, index;
-        Scanner input = new Scanner(System.in);
+        double rating;
         Coment coment;
         ArrayList<Coment> coments;
+        String strInput, comm;
+        Scanner input = new Scanner(System.in);
 
         System.out.print("Code of trip to rate and/or comment: ");
         strInput = input.nextLine();
@@ -210,12 +215,32 @@ public class Regular extends Client{
         trips.get(index).setComents(coments);
     }
 
-    public void listCommentsTrip(ArrayList<Coment> coments) {
+    public void listCommentsTrip(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        ArrayList<Coment> coments;
+        int code, index;
+        Scanner input = new Scanner(System.in);
+        String strInput;
+
+        System.out.print("Code of trip to list coments: ");
+        strInput = input.nextLine();
+        while (!acessTripCodeSecurity(trips, strInput)) {
+            System.out.print("Invalid input, code of trip to list coments: ");
+            strInput = input.nextLine();
+        }
+        code = Integer.parseInt(strInput);
+
+        index = indexOfTrip(trips, code);
+        coments = trips.get(index).getComents();
+
         for (Coment coment : coments)
             System.out.println(coment);
+
     }
 
-    public double leaveWaitingList(ArrayList<Trip> trips) {
+    public double leaveWaitingList(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+
         for (Trip trip : trips) {
             ArrayList<User> waitingList = trip.getWaitingList();
 
@@ -227,7 +252,7 @@ public class Regular extends Client{
                 }
             }
         }
-        return reserveTrip(trips);
+        return reserveTrip(agency);
     }
 
     public double payment(Trip trip) {

@@ -3,17 +3,15 @@ package projectPackage;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO por dar delete a outros admins, altera-los e criar
-//TODO alterar os comentarios e rating
-
 public class Admin extends User {
 
     public Admin(String name, String nif, String address, String email, String phone, String password, int type) {
         super(name, nif, address, email, phone, password, type);
     }
 
-    //TODO Mudar o input do type
-    public void createClient(ArrayList<User> users) {
+    public void createUser(Agency agency) {
+        ArrayList<User> users = agency.getUsers();
+
         int type;
         String name, nif, address, email, phone, password, typeInput;
         Scanner input = new Scanner(System.in);
@@ -59,28 +57,39 @@ public class Admin extends User {
         if (type == 1) {
             Admin admin = new Admin(name, nif, address, email, phone, password, type);
             users.add(admin);
+            agency.setUsers(users);
             System.out.println("Operation sucefull");
         }
         else if (type == 2) {
             Premium premium = new Premium(name, nif, address, email, phone, password, type);
             users.add(premium);
+            agency.setUsers(users);
             System.out.println("Operation sucefull");
         }
         else if (type == 3) {
             Regular regular = new Regular(name, nif, address, email, phone, password, type);
             users.add(regular);
+            agency.setUsers(users);
             System.out.println("Operation sucefull");
         }
     }
 
-    public void deleteUser(ArrayList<User> users) {
+    public void deleteUser(Agency agency) {
+        ArrayList<User> users = agency.getUsers();
         Scanner input = new Scanner(System.in);
+        String nif;
+
         System.out.print("NIF of user to delete: ");
-        String nif = input.nextLine();
+        nif = input.nextLine();
+        while (!checkIfNifExists(users, nif)) {
+            System.out.println("NIF  doesn't exist, NIF of user to delete:");
+        }
+
 
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getNif().equals(nif)) {
                 users.remove(i);
+                agency.setUsers(users);
                 System.out.println("Client sucefully removed");
                 return;
             }
@@ -88,10 +97,12 @@ public class Admin extends User {
         System.out.println("Client not found");
     }
 
-    public void modifyClient(ArrayList<User> users) {
+    public void modifyUser(Agency agency) {
         Scanner input = new Scanner(System.in);
         String strInput, name, nif, address, email, phone, password;
         int choice, type, index;
+        ArrayList<User> users = agency.getUsers();
+
 
         System.out.print("NIF of client you want to modify: ");
         strInput = input.nextLine();
@@ -159,36 +170,43 @@ public class Admin extends User {
                 users.get(index).setPhone(phone);
                 users.get(index).setPassword(password);
                 users.get(index).setType(type);
+                agency.setUsers(users);
                 break;
             case 1:
                 System.out.print("Client's new name: ");
                 name = input.nextLine();
                 users.get(index).setName(name);
+                agency.setUsers(users);
                 break;
             case 2:
                 System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
                 users.get(index).setNif(nif);
+                agency.setUsers(users);
                 break;
             case 3:
                 System.out.print("Client's new address: ");
                 address = input.nextLine();
                 users.get(index).setAddress(address);
+                agency.setUsers(users);
                 break;
             case 4:
                 System.out.print("Client's new email: ");
                 email = input.nextLine();
                 users.get(index).setEmail(email);
+                agency.setUsers(users);
                 break;
             case 5:
                 System.out.print("Client's new phone number:");
                 phone = input.nextLine();
                 users.get(index).setPhone(phone);
+                agency.setUsers(users);
                 break;
             case 6:
                 System.out.print("Client's new password: ");
                 password = input.nextLine();
                 users.get(index).setPassword(password);
+                agency.setUsers(users);
                 break;
             case 7:
                 System.out.print("Client's type: ");
@@ -199,6 +217,7 @@ public class Admin extends User {
                 }
                 type = Integer.parseInt(strInput);
                 users.get(index).setType(type);
+                agency.setUsers(users);
                 break;
             default:
                 System.out.println("Invalid Operation");
@@ -206,7 +225,9 @@ public class Admin extends User {
         System.out.println("Operation sucefull");
     }
 
-    public void listClients(ArrayList<User> users) {
+    public void listUsers(Agency agency) {
+        ArrayList<User> users = agency.getUsers();
+
         for (User user : users) {
             if (user.getType() == 2 || user.getType() == 3) {
                 Client client = (Client) user;
@@ -218,17 +239,19 @@ public class Admin extends User {
         }
     }
 
-    public void listTrips(ArrayList<Trip> trips) {
-        for (Trip trip : trips) {
+    public void listTrips(Agency agency) {
+        for (Trip trip : agency.getTrips()) {
             System.out.println(trip);
         }
     }
 
-    //Mudar as strings de inputs
-    public void createTrip(ArrayList<Trip> trips, ArrayList<Bus> buses) {
-        Scanner input = new Scanner(System.in);
+    public void createTrip(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        ArrayList<Bus> buses = agency.getBuses();
+
         int code, year, month, day, hour, minute, numBuses;
         double price, duration;
+        Scanner input = new Scanner(System.in);
         String strInput;
 
         System.out.print("Trip code: ");
@@ -326,11 +349,11 @@ public class Admin extends User {
 
             switch (choice) {
                 case 1:
-                    listBuses(buses);
+                    listBuses(agency);
                     System.out.print("License plate of the bus: ");
                     strInput = input.nextLine();
                     while (!checkIfLicensePlateExists(buses, strInput)) {
-                        System.out.print("Invalid input, license plate of the bus: ");
+                        System.out.print("License plate not found, license plate of the bus: ");
                         strInput = input.nextLine();
                     }
                     int index = indexOfBus(buses, strInput);
@@ -338,7 +361,7 @@ public class Admin extends User {
                     newTripBuses.add(buses.get(index));
                     break;
                 case 2:
-                    newTripBuses.add(createBus(buses));
+                    newTripBuses.add(createBus(agency));
                     break;
                 default:
                     System.out.println("Invalid operation");
@@ -347,36 +370,43 @@ public class Admin extends User {
 
         Trip trip = new Trip(code, origin, destiny, price, duration, date, newTripBuses);
         trips.add(trip);
+        agency.setTrips(trips);
         System.out.println("Operation sucefull");
     }
 
-    public void deleteTrip(ArrayList<Trip> trips) {
-        listTrips(trips);
-        System.out.print("Code of Trip to delete: ");
+    public void deleteTrip(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        int code;
         Scanner input = new Scanner(System.in);
-        String strInput = input.nextLine();
+        String strInput;
+
+        listTrips(agency);
+        System.out.print("Code of Trip to delete: ");
+        strInput = input.nextLine();
         while (!acessTripCodeSecurity(trips, strInput)) {
             System.out.print("Invalid input, code of trip do delete: ");
             strInput = input.nextLine();
         }
-        int code = Integer.parseInt(strInput);
+        code = Integer.parseInt(strInput);
 
         for (int i = 0; i < trips.size(); i++) {
-            if (trips.get(i).getCode() == code) {
+            int tripCode = trips.get(i).getCode();
+            if (tripCode == code) {
                 trips.remove(i);
+                agency.setTrips(trips);
                 System.out.println("Trip sucefully removed");
                 return;
             }
         }
-        System.out.println("Trip not found");
     }
 
-    public void modifyTrip(ArrayList<Trip> trips, ArrayList<Bus> buses) {
+    public void modifyTrip(Agency agency) {
         int code, index, minute, hour, day, month, year;
         double price, duration;
         String strInput, origin, destiny;
         Date date;
         Scanner input = new Scanner(System.in);
+        ArrayList<Trip> trips = agency.getTrips();
 
         System.out.print("Code of trip to modify: ");
         strInput = input.nextLine();
@@ -386,6 +416,7 @@ public class Admin extends User {
         }
         code = Integer.parseInt(strInput);
         index = indexOfTrip(trips, code);
+        ArrayList<Bus> buses = trips.get(index).getBuses();
 
         System.out.println("[0] --> All\n"      +
                            "[1] --> Code\n"     +
@@ -482,6 +513,7 @@ public class Admin extends User {
                 trips.get(index).setPrice(price);
                 trips.get(index).setDuration(duration);
                 trips.get(index).setDate(date);
+                agency.setTrips(trips);
                 break;
             case 1:
                 System.out.print("Trip new code: ");
@@ -492,16 +524,19 @@ public class Admin extends User {
                 }
                 code = Integer.parseInt(strInput);
                 trips.get(index).setCode(code);
+                agency.setTrips(trips);
                 break;
             case 2:
                 System.out.print("Trip new origin: ");
                 strInput = input.nextLine();
                 trips.get(index).setOrigin(strInput);
+                agency.setTrips(trips);
                 break;
             case 3:
                 System.out.print("Trip new destiny: ");
                 strInput = input.nextLine();
                 trips.get(index).setDestiny(strInput);
+                agency.setTrips(trips);
                 break;
             case 4:
                 System.out.print("Trip new price: ");
@@ -512,6 +547,7 @@ public class Admin extends User {
                 }
                 price = Double.parseDouble(strInput);
                 trips.get(index).setPrice(price);
+                agency.setTrips(trips);
                 break;
             case 5:
                 System.out.print("Trip new duration:");
@@ -522,6 +558,7 @@ public class Admin extends User {
                 }
                 duration = Double.parseDouble(strInput);
                 trips.get(index).setDuration(duration);
+                agency.setTrips(trips);
                 break;
             case 6:
                 System.out.print("Trip new year: ");
@@ -565,13 +602,15 @@ public class Admin extends User {
 
                 date = new Date(minute, hour, day, month, year);
                 trips.get(index).setDate(date);
+                agency.setTrips(trips);
                 break;
             case 7:
                 System.out.print("License Plate of bus to modify: ");
                 strInput = input.nextLine();
-                for (Bus bus : trips.get(index).getBuses()) {
+
+                for (Bus bus : buses) {
                     if (bus.getLicensePlate().equals(strInput)) {
-                        modifyBus(buses);
+                        modifyBus(agency);
                         break;
                     }
                 }
@@ -582,7 +621,8 @@ public class Admin extends User {
         System.out.println("Operation sucefull");
     }
 
-    public Bus createBus(ArrayList<Bus> buses) {
+    public Bus createBus(Agency agency) {
+        ArrayList<Bus> buses = agency.getBuses();
         Scanner input = new Scanner(System.in);
         String licensePlate, capacityInput;
         Bus bus;
@@ -606,20 +646,22 @@ public class Admin extends User {
         return bus;
     }
 
-    public void deleteBus(ArrayList<Bus> buses) {
+    public void deleteBus(Agency agency) {
         Scanner input = new Scanner(System.in);
         String licensePlate;
+        ArrayList<Bus> buses = agency.getBuses();
 
-        System.out.print("License Plate of bus to delete: ");
+        System.out.print("License plate of bus to delete: ");
         licensePlate = input.nextLine();
         while(!checkIfLicensePlateExists(buses, licensePlate)) {
-            System.out.print("Invalid input, license plate of bus to modify: ");
+            System.out.print("License plate not found, license plate of bus to modify: ");
             licensePlate = input.nextLine();
         }
 
         for (int i = 0; i < buses.size(); i++) {
             if (buses.get(i).getLicensePlate().equals(licensePlate)) {
                 buses.remove(i);
+                agency.setBuses(buses);
                 System.out.println("Bus sucefully removed");
                 return;
             }
@@ -627,17 +669,17 @@ public class Admin extends User {
         System.out.println("Bus not found");
     }
 
-    //Acrescenta a opçao de poder mudar os lugares ocupados?
-    public void modifyBus(ArrayList<Bus> buses) {
-        Scanner input = new Scanner(System.in);
-        String strInput, newLicensePlate;
+    public void modifyBus(Agency agency) {
         int choice, newCapacity, index;
-        listBuses(buses);
+        String strInput, newLicensePlate;
+        Scanner input = new Scanner(System.in);
+        ArrayList<Bus> buses = agency.getBuses();
 
+        listBuses(agency);
         System.out.print("License plate of bus to modify: ");
         strInput = input.nextLine();
         while (!checkIfLicensePlateExists(buses, strInput)) {
-            System.out.print("License plate doesn't exist, license plate of bus to modify: ");
+            System.out.print("License plate not found, license plate of bus to modify: ");
             strInput = input.nextLine();
         }
         index = indexOfBus(buses, strInput);
@@ -666,11 +708,13 @@ public class Admin extends User {
                 newCapacity = Integer.parseInt(strInput);
                 buses.get(index).setLicensePlate(newLicensePlate);
                 buses.get(index).setCapacity(newCapacity);
+                agency.setBuses(buses);
                 break;
             case 1:
                 System.out.print("Bus new license plate: ");
                 newLicensePlate = input.nextLine();
                 buses.get(index).setLicensePlate(newLicensePlate);
+                agency.setBuses(buses);
                 return;
             case 2:
                 System.out.print("Bus new capacity: ");
@@ -681,19 +725,21 @@ public class Admin extends User {
                 }
                 newCapacity = Integer.parseInt(strInput);
                 buses.get(index).setCapacity(newCapacity);
+                agency.setBuses(buses);
                 break;
             default:
                 System.out.println("Invalid Operation");
         }
     }
 
-    public void listBuses(ArrayList<Bus> buses) {
-        for (Bus bus : buses) {
+    public void listBuses(Agency agency) {
+        for (Bus bus : agency.getBuses()) {
             System.out.println(bus);
         }
     }
 
-    public void mostSoldTripInMonth(ArrayList<Trip> trips) {
+    public void mostSoldTripInMonth(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
         int month;
         int mostSells = 0;
         String strInput;
@@ -716,10 +762,12 @@ public class Admin extends User {
             }
         }
         if (mostSold != null)
-            System.out.println("The most sold trip was " + mostSold + " with " + mostSells + " trips sold");
+            System.out.println("The most sold trip in the month " + month +
+                               " was " + mostSold + " with " + mostSells + " trips sold");
     }
 
-    public void clientMostTripsBoughtInMonth(ArrayList<User> users) {
+    public void clientMostTripsBoughtInMonth(Agency agency) {
+        ArrayList<User> users = agency.getUsers();
         int month;
         int mostBought = 0;
         String strInput;
@@ -747,10 +795,12 @@ public class Admin extends User {
         }
 
         if (mostTripsBought != null)
-            System.out.println("The user that most trips bought is " + mostTripsBought + " with " + mostBought + " trips bought");
+            System.out.println("The client that most trips bought in the month " + month + " is " +
+                               mostTripsBought + " with " + mostBought + " trips bought");
     }
 
-    public void tripsNotSoldInMonth(ArrayList<Trip> trips) {
+    public void tripsNotSoldInMonth(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
         int month;
         String strInput;
         Scanner input = new Scanner(System.in);
@@ -766,6 +816,56 @@ public class Admin extends User {
         for (Trip trip : trips) {
             if (trip.getSalesByMonth()[month] == 0)
                 System.out.println(trip);
+        }
+    }
+
+    public void averageRatingOfTrip(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        int month , tripMonth;
+        double bestRating = 0;
+        Trip bestTrip = null;
+        String strInput;
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Month: ");
+        strInput = input.nextLine();
+        while (!dateMonthSecurity(strInput)) {
+            System.out.print("Invalid input, month: ");
+            strInput = input.nextLine();
+        }
+        month = Integer.parseInt(strInput);
+
+        for (Trip trip : trips) {
+            tripMonth = trip.getDate().getMonth();
+
+            if (month == tripMonth) {
+                double tripRating = trip.averageRating();
+
+                if (tripRating > bestRating) {
+                    bestRating = tripRating;
+                    bestTrip = trip;
+                }
+            }
+        }
+
+        if (bestTrip != null)
+            System.out.println("The trip with the best rating in the month " + month + " is" +
+                               bestTrip + " with " + bestRating + " of rating");
+    }
+
+    public void listWaitingClients(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        for (Trip trip : trips) {
+            Bus firstBus = trip.getBuses().get(0);
+            if (!checkIfTripFull(firstBus))
+                continue;
+
+            ArrayList<User> waitingList = trip.getWaitingList();
+            System.out.println("Users in waiting list for " + trip + ":");
+            for (User user : waitingList) {
+                Client client = (Client) user;
+                System.out.println(client);
+            }
         }
     }
 }

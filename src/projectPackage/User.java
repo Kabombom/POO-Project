@@ -66,7 +66,6 @@ public class User {
         }
     }
 
-    //Security for switches used, verifies if the input given is a integer
     public boolean generalSecurity(String strInput) {
         try {
             int input = Integer.parseInt(strInput);
@@ -76,7 +75,6 @@ public class User {
         }
     }
 
-    //Protects the user type given by the user from bad inputs (char, string, etc) and invalid types
     public boolean typeSecurity(String strInput) {
         try {
             int input = Integer.parseInt(strInput);
@@ -95,7 +93,6 @@ public class User {
         }
     }
 
-    //Protects the trip code given by the user from bad inputs (char, string, etc) and invalid trip codes (already existing ones)
     public boolean acessTripCodeSecurity(ArrayList<Trip> trips, String strInput) {
         try {
             int code = Integer.parseInt(strInput);
@@ -105,7 +102,6 @@ public class User {
         }
     }
 
-    //Protects the trip price given by the user from bad inputs (char, string, etc)
     public boolean tripPriceSecurity(String strInput) {
         try {
             double price = Double.parseDouble(strInput);
@@ -115,7 +111,6 @@ public class User {
         }
     }
 
-    //Protects the trip duration given by the user from bad inputs (char, string, etc)
     public boolean tripDurationSecurity(String strInput) {
         try {
             double duration = Double.parseDouble(strInput);
@@ -125,7 +120,6 @@ public class User {
         }
     }
 
-    //Protects the minute of date given by the user from bad inputs (char, string, etc) and invalid minutes
     public boolean dateMinuteSecurity(String strInput) {
         try {
             int input = Integer.parseInt(strInput);
@@ -135,7 +129,6 @@ public class User {
         }
     }
 
-    //Protects the hourd of date given by the user from bad inputs (char, string, etc) and invalid hours
     public boolean dateHourSecurity(String strInput) {
         try {
             int hour = Integer.parseInt(strInput);
@@ -218,7 +211,6 @@ public class User {
         return false;
     }
 
-    //When searching a trip or creating a new one  we need to check if the trip code already exists
     public boolean checkIfTripCodeExists(ArrayList<Trip> trips, int code) {
         for (Trip trip: trips) {
             if (trip.getCode() == code)
@@ -227,7 +219,6 @@ public class User {
         return false;
     }
 
-    //Checks if a trip is full or not. Returns false if is't full
     public boolean checkIfTripFull(Bus bus) {
         for (boolean takenSeat : bus.getTakenSeats()) {
             if (!takenSeat) {
@@ -237,7 +228,6 @@ public class User {
         return true;
     }
 
-    //Checks if the license plate given by the user already exists in the buses of the Travel Agency.
     public boolean checkIfLicensePlateExists(ArrayList<Bus> buses, String strInput) {
         for (Bus bus : buses) {
             if (bus.getLicensePlate().equals(strInput))
@@ -246,7 +236,6 @@ public class User {
         return false;
     }
 
-    //Returns the index of a client in an ArrayList
     public int indexOfClient(ArrayList<User> users, String nif) {
         int i;
         for (i = 0; i < users.size(); i++) {
@@ -256,7 +245,6 @@ public class User {
         return i;
     }
 
-    //Returns the index of a trip in an ArrayList
     public int indexOfTrip(ArrayList<Trip> trips, int code) {
         int i;
         for (i = 0; i < trips.size(); i++) {
@@ -266,7 +254,6 @@ public class User {
         return i;
     }
 
-    //Returns the index of a bus in an ArrayList
     public int indexOfBus(ArrayList<Bus> buses, String licensePlate) {
         int i;
         for (i = 0; i < buses.size(); i++) {
@@ -278,7 +265,7 @@ public class User {
 
     public int compareDates(Calendar calendar, Date date) {
         int currentYear = calendar.get(Calendar.YEAR);
-        //Months indexed like array
+        //Months of class calendar are indexed array like
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
         int tripYear = date.getYear();
