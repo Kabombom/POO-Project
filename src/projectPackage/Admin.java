@@ -376,7 +376,7 @@ public class Admin extends User {
 
     public void deleteTrip(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
-        int code;
+        int code, index;
         Scanner input = new Scanner(System.in);
         String strInput;
 
@@ -389,15 +389,8 @@ public class Admin extends User {
         }
         code = Integer.parseInt(strInput);
 
-        for (int i = 0; i < trips.size(); i++) {
-            int tripCode = trips.get(i).getCode();
-            if (tripCode == code) {
-                trips.remove(i);
-                agency.setTrips(trips);
-                System.out.println("Trip sucefully removed");
-                return;
-            }
-        }
+        index = indexOfTrip(trips, code);
+
     }
 
     public void modifyTrip(Agency agency) {
@@ -651,6 +644,7 @@ public class Admin extends User {
         String licensePlate;
         ArrayList<Bus> buses = agency.getBuses();
 
+        listBuses(agency);
         System.out.print("License plate of bus to delete: ");
         licensePlate = input.nextLine();
         while(!checkIfLicensePlateExists(buses, licensePlate)) {
@@ -659,7 +653,16 @@ public class Admin extends User {
         }
 
         for (int i = 0; i < buses.size(); i++) {
-            if (buses.get(i).getLicensePlate().equals(licensePlate)) {
+            Bus bus = buses.get(i);
+            String busLicensePlate = bus.getLicensePlate();
+
+            if (busLicensePlate.equals(licensePlate)) {
+                for (boolean seat : bus.getTakenSeats()) {
+                    if (seat) {
+                        System.out.println("Bus has clients with seats reserved");
+                        return;
+                    }
+                }
                 buses.remove(i);
                 agency.setBuses(buses);
                 System.out.println("Bus sucefully removed");
@@ -819,6 +822,54 @@ public class Admin extends User {
         }
     }
 
+    public void listTripReserves(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        Trip trip;
+        int code, index;
+        String strInput;
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Code of trip to list reserves: ");
+        strInput = input.nextLine();
+        while (!acessTripCodeSecurity(trips, strInput)) {
+            System.out.print("Invalid input, code of trip: to list reserves: ");
+            strInput = input.nextLine();
+        }
+        code = Integer.parseInt(strInput);
+
+        index = indexOfTrip(trips, code);
+        trip = trips.get(index);
+
+        for (Reserve reserve : trip.getReservesOfTrip()) {
+            if (reserve.getState())
+                System.out.print(reserve);
+        }
+    }
+
+    public void listTripCanceledReserves(Agency agency) {
+        ArrayList<Trip> trips = agency.getTrips();
+        Trip trip;
+        int code, index;
+        String strInput;
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Code of trip to list reserves: ");
+        strInput = input.nextLine();
+        while (!acessTripCodeSecurity(trips, strInput)) {
+            System.out.print("Invalid input, code of trip: to list reserves: ");
+            strInput = input.nextLine();
+        }
+        code = Integer.parseInt(strInput);
+
+        index = indexOfTrip(trips, code);
+        trip = trips.get(index);
+
+        for (Reserve reserve : trip.getReservesOfTrip()) {
+            if (!reserve.getState())
+                System.out.print(reserve);
+        }
+    }
+
     public void averageRatingOfTrip(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
         int month , tripMonth;
@@ -867,5 +918,9 @@ public class Admin extends User {
                 System.out.println(client);
             }
         }
+    }
+
+    public void listDayWithMostSells(Agency agency) {
+
     }
 }

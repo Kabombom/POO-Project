@@ -1,16 +1,16 @@
 package projectPackage;
 
-import java.util.ArrayList;
-
 public class Reserve {
-    private Client  client;
-    private Trip trip;
     private int seatNumber;
+    private boolean state;
+    private Trip trip;
+    private Client  client;
 
     public Reserve(Client client, Trip trip, int seatNumber) {
         this.client = client;
         this.trip = trip;
         this.seatNumber = seatNumber;
+        this.state = true;
     }
 
     public Client getClient() {
@@ -25,6 +25,9 @@ public class Reserve {
 
     public int getSeatNumber() { return seatNumber; }
     public void setSeatNumber(int seatNumber) { this.seatNumber = seatNumber; }
+
+    public boolean getState() { return state; }
+    public void setState(boolean state) { this.state = state; }
 
     @Override
     public String toString() {

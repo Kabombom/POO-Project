@@ -1,6 +1,5 @@
 package projectPackage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -14,6 +13,7 @@ public class Trip {
     private ArrayList<Bus> buses;
     private ArrayList<Coment> coments;
     private ArrayList<User> waitingList;
+    private ArrayList<Reserve> reservesOfTrip;
 
     public Trip(int code, String origin, String destiny, double price, double duration, Date date, ArrayList<Bus> buses) {
         this.code = code;
@@ -26,6 +26,7 @@ public class Trip {
         this.buses = buses;
         this.waitingList = new ArrayList<>();
         this.coments = new ArrayList<>();
+        this.reservesOfTrip = new ArrayList<>();
     }
 
     //Getters and Setters
@@ -59,6 +60,9 @@ public class Trip {
     public ArrayList<User> getWaitingList() { return waitingList; }
     public void setWaitingList(ArrayList<User> waitingList) { this.waitingList = waitingList; }
 
+    public ArrayList<Reserve> getReservesOfTrip() { return reservesOfTrip; }
+    public void setReservesOfTrip(ArrayList<Reserve> reservesOfTrip) { this.reservesOfTrip = reservesOfTrip; }
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -76,8 +80,8 @@ public class Trip {
     }
 
     public void notifyWaitingList() {
-        System.out.println("Dear clients of Costa & Machado the " + this + " is now avaiable\n" +
-                           "If you wish to complete your reservation proceed with the payment, the first client to pay gets the reservation.");
+            System.out.println("Dear clients of Costa & Machado the " + this + " is now avaiable\n" +
+                    "If you wish to complete your reservation proceed with the payment, the first client to pay gets the reservation.");
     }
 
     public double averageRating() {

@@ -27,12 +27,13 @@ public class Regular extends Client{
         }
     }
 
-    public double reserveTrip(Agency agency) {
+    public void reserveTrip(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
 
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
+        double profit = agency.getProfit();
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
 
@@ -62,11 +63,11 @@ public class Regular extends Client{
 
                     switch (choice) {
                         case 0:
-                            return 0;
+                            return;
                         case 1:
                             trip.getWaitingList().add(this);
                             System.out.print("Operation Sucefull");
-                            return 0;
+                            return;
                         default:
                             System.out.println("Invalid operation");
                     }
@@ -87,17 +88,19 @@ public class Regular extends Client{
                     strInput = input.nextLine();
                 }
                 int seatNumber = Integer.parseInt(strInput) - 1;
-                firstBus.addTakenSeat(seatNumber);
+
+                for (Bus bus : trip.getBuses())
+                    bus.addTakenSeat(seatNumber);
 
                 trip.getSalesByMonth()[currentMonth]++;
                 this.getTripsBoughtByMonth()[currentMonth]++;
 
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
-                return payment(trip);
+                profit += payment(trip);
+                agency.setProfit(profit);
             }
         }
-        return 0;
     }
 
     public void listReserves() {
@@ -123,9 +126,9 @@ public class Regular extends Client{
         }
     }
 
-    public double cancelReserve() {
+    public void cancelReserve(Agency agency) {
         int code, tripCode, differenceOfDates;
-        double profit;
+        double profit = agency.getProfit();
         //Getting current date
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
@@ -136,12 +139,11 @@ public class Regular extends Client{
         Trip trip;
         Bus firstBus;
         ArrayList<Reserve> reserves = this.getClientReserves();
-        ArrayList<User> waitingList;
 
         this.listReserves();
         System.out.print("Trip code of the reserve to cancel: ");
         strInput = input.nextLine();
-        while(!cancelReserveCodeSecurity(reserves, strInput)) {
+        while (!cancelReserveCodeSecurity(reserves, strInput)) {
             System.out.print("Invalid input, trip code of the reserve to cancel: ");
             strInput = input.nextLine();
         }
@@ -154,31 +156,33 @@ public class Regular extends Client{
 
             if (tripCode == code) {
                 firstBus = trip.getBuses().get(0);
-                waitingList = trip.getWaitingList();
                 differenceOfDates = compareDates(calendar, trip.getDate());
 
-                if (differenceOfDates < 2) {
-                    profit = payment(trip);
-                } else {
-                    profit = 0;
-                }
+                if (differenceOfDates > 7)
+                    profit -= payment(trip) * 0.5;
 
-                if (checkIfTripFull(firstBus)) {
-                    for (User user : waitingList)
+                if (checkIfTripFull(firstBus))
                         reserve.getTrip().notifyWaitingList();
-                }
 
                 trip.getSalesByMonth()[currentMonth]--;
                 this.getTripsBoughtByMonth()[currentMonth]--;
 
+                ArrayList<Reserve> reservesOfTrip = trip.getReservesOfTrip();
+                for (Reserve reserveOfTrip : reservesOfTrip) {
+                    if (reserveOfTrip.getClient() == this)
+                        reserveOfTrip.setState(false);
+                }
+
                 firstBus.deleteTakenSeat(reserve.getSeatNumber());
                 reserves.remove(i);
                 System.out.println("Operation Successful");
-                return profit;
+                System.out.println(profit);
+                agency.setProfit(profit);
+
             }
         }
-        return 0;
     }
+
 
     public void addCommentTrip(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
@@ -238,7 +242,7 @@ public class Regular extends Client{
 
     }
 
-    public double leaveWaitingList(Agency agency) {
+    public void leaveWaitingList(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
 
         for (Trip trip : trips) {
@@ -249,10 +253,10 @@ public class Regular extends Client{
                 if (toCompare == this) {
                     waitingList.remove(i);
                     trip.setWaitingList(waitingList);
+                    reserveTrip(agency);
                 }
             }
         }
-        return reserveTrip(agency);
     }
 
     public double payment(Trip trip) {

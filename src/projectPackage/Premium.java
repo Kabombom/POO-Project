@@ -28,7 +28,7 @@ public class Premium extends Client {
         }
     }
 
-    public double reserveTrip(Agency agency) {
+    public void reserveTrip(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
 
         Scanner input = new Scanner(System.in);
@@ -63,11 +63,11 @@ public class Premium extends Client {
 
                     switch (choice) {
                         case 0:
-                            return 0;
+                            return;
                         case 1:
                             trip.getWaitingList().add(this);
                             System.out.print("Operation Sucefull");
-                            return 0;
+                            return;
                         default:
                             System.out.println("Invalid operation");
                     }
@@ -88,17 +88,21 @@ public class Premium extends Client {
                     strInput = input.nextLine();
                 }
                 int seatNumber = Integer.parseInt(strInput) - 1;
-                firstBus.addTakenSeat(seatNumber);
+
+                for (Bus bus : trip.getBuses())
+                    bus.addTakenSeat(seatNumber);
 
                 trip.getSalesByMonth()[currentMonth]++;
                 this.getTripsBoughtByMonth()[currentMonth]++;
 
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
-                return payment(trip);
+                trip.getReservesOfTrip().add(reserve);
+                double profit = agency.getProfit() + payment(trip);
+                System.out.println(profit);
+                agency.setProfit(profit);
             }
         }
-        return 0;
     }
 
     public void listReserves() {
@@ -124,9 +128,9 @@ public class Premium extends Client {
         }
     }
 
-    public double cancelReserve() {
+    public void cancelReserve(Agency agency) {
         int code, tripCode, differenceOfDates;
-        double profit;
+        double profit = agency.getProfit();
         //Getting current date
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
@@ -137,7 +141,6 @@ public class Premium extends Client {
         Trip trip;
         Bus firstBus;
         ArrayList<Reserve> reserves = this.getClientReserves();
-        ArrayList<User> waitingList;
 
         this.listReserves();
         System.out.print("Trip code of the reserve to cancel: ");
@@ -155,30 +158,29 @@ public class Premium extends Client {
 
             if (tripCode == code) {
                 firstBus = trip.getBuses().get(0);
-                waitingList = trip.getWaitingList();
                 differenceOfDates = compareDates(calendar, trip.getDate());
+                System.out.println(differenceOfDates);
+                if (differenceOfDates > 2)
+                    profit -= payment(trip);
 
-                if (differenceOfDates < 2) {
-                    profit = payment(trip);
-                } else {
-                    profit = 0;
-                }
-
-                if (checkIfTripFull(firstBus)) {
-                    for (User user : waitingList)
-                        reserve.getTrip().notifyWaitingList();
-                }
+                if (checkIfTripFull(firstBus))
+                    reserve.getTrip().notifyWaitingList();
 
                 trip.getSalesByMonth()[currentMonth]--;
                 this.getTripsBoughtByMonth()[currentMonth]--;
 
-                firstBus.deleteTakenSeat(reserve.getSeatNumber());
+                ArrayList<Reserve> reservesOfTrip = trip.getReservesOfTrip();
+                for (Reserve reserveOfTrip : reservesOfTrip) {
+                    if (reserveOfTrip.getClient() == this)
+                        reserveOfTrip.setState(false);
+                }
+
                 reserves.remove(i);
                 System.out.println("Operation Successful");
-                return profit;
+                System.out.println(profit);
+                agency.setProfit(profit);
             }
         }
-        return 0;
     }
 
     public void addCommentTrip(Agency agency) {
@@ -238,7 +240,7 @@ public class Premium extends Client {
             System.out.println(coment);
     }
 
-    public double leaveWaitingList(Agency agency) {
+    public void leaveWaitingList(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
 
         for (Trip trip : trips) {
@@ -249,10 +251,10 @@ public class Premium extends Client {
                 if (toCompare == this) {
                     waitingList.remove(i);
                     trip.setWaitingList(waitingList);
+                    reserveTrip(agency);
                 }
             }
         }
-        return reserveTrip(agency);
     }
 
     public double payment(Trip trip) {

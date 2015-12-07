@@ -21,12 +21,12 @@ public abstract class Client extends User{
     public void setTripsBoughtByMonth(int[] tripsBoughtByMonth) { this.tripsBoughtByMonth = tripsBoughtByMonth; }
 
     public abstract void listAvaiableTrips(Agency agency);
-    public abstract double reserveTrip(Agency agency);
+    public abstract void reserveTrip(Agency agency);
     public abstract void listReserves();
-    public abstract double cancelReserve();
+    public abstract void cancelReserve(Agency agency);
     public abstract void addCommentTrip(Agency agency);
     public abstract void listCommentsTrip(Agency agency);
-    public abstract double leaveWaitingList(Agency agency);
+    public abstract void leaveWaitingList(Agency agency);
     public abstract double payment(Trip trip);
 
 }

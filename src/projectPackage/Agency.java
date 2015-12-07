@@ -2,10 +2,14 @@ package projectPackage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 
-//TODO verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
+//verificar a segurança do dia
+//como notificar waiting list?
+//verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
 //METER NAS SEGURANÇAS UMA FORMA DE SAIR DOS INPUTS
+//TODO waiting list
 //TODO começar a implementar ficheiros
 //TODO javadocs
 //TODO relatorio
@@ -15,6 +19,8 @@ public class Agency implements Ficheiro, Menu{
     private ArrayList<Trip> trips = new ArrayList<>();
     private ArrayList<Bus> buses = new ArrayList<>();
     private double profit;
+    private int[] currentDaySells = new int[2];
+    private int[] dayWithMostSells = new int[2];
 
     public Agency(ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses, double profit) {
         this.users = users;
@@ -35,7 +41,12 @@ public class Agency implements Ficheiro, Menu{
     public double getProfit() { return profit; }
     public void setProfit(double profit) { this.profit = profit; }
 
+    public int[] getCurrentDaySells() { return currentDaySells; }
+    public void setCurrentDaySells(int[] currentDaySells) { this.currentDaySells = currentDaySells; }
 
+    public int[] getDayWithMostSells() { return dayWithMostSells; }
+
+    public void setDayWithMostSells(int[] dayWithMostSells) { this.dayWithMostSells = dayWithMostSells; }
 
     public void writeOneLine(File toWrite, String line) {
         try	{
@@ -138,6 +149,30 @@ public class Agency implements Ficheiro, Menu{
                 return checkIfUserExists(users, email, password);
          }
         return null;
+    }
+
+    public void daySecurity(Agency agency) {
+        int[] currentDaySells = agency.getCurrentDaySells();
+        int[] dayWithMostSells = agency.getDayWithMostSells();
+        Calendar calendar = Calendar.getInstance();
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        System.out.println(currentDay);
+        if (currentDaySells[0] == currentDay)
+            currentDaySells[1]++;
+        else {
+            if (currentDaySells[1] > dayWithMostSells[1]) {
+                dayWithMostSells[0] = currentDaySells[0];
+                dayWithMostSells[1] = currentDaySells[1];
+                currentDaySells[0] = currentDay;
+                currentDaySells[1] = 0;
+                agency.setCurrentDaySells(currentDaySells);
+                agency.setDayWithMostSells(dayWithMostSells);
+            } else {
+                currentDaySells[0] = currentDay;
+                currentDaySells[1] = 0;
+                agency.setCurrentDaySells(currentDaySells);
+            }
+        }
     }
 
     public boolean optionsSecurity(String  strInput) {
@@ -251,18 +286,19 @@ public class Agency implements Ficheiro, Menu{
     public void clientMenu(Agency agency, Client client) {
         String strInput;
         int choice;
+
         double profitToAdd = this.getProfit();
         Scanner input = new Scanner(System.in);
 
         while (true) {
             System.out.print("WELCOME TO THE CLIENT MENU\n"             +
-                    "[0] --> Leave Menu\t\t\t\t\t\t\t\t"                      +
+                    "[0] --> Leave Menu\t\t\t\t\t\t\t\t"                +
                     "[1] --> List Avaiable Trips\n"                     +
-                    "[2] --> Reserve Trip\t\t\t\t\t\t\t"                      +
+                    "[2] --> Reserve Trip\t\t\t\t\t\t\t"                +
                     "[3] --> Cancel Reserve\n"                          +
-                    "[4] --> List Your Reserves\t\t\t\t\t\t"                  +
+                    "[4] --> List Your Reserves\t\t\t\t\t\t"            +
                     "[5] --> Rate and/or comment trip\n"                +
-                    "[6] --> Reserve trip and leave waiting list\t\t"     +
+                    "[6] --> Reserve trip and leave waiting list\t\t"   +
                     "[7] --> Logout\n"                                  +
                     "What do you wish to do: ");
             strInput = input.nextLine();
@@ -280,13 +316,12 @@ public class Agency implements Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 2:
-                    profitToAdd += client.reserveTrip(agency);
-                    agency.setProfit(profitToAdd);
+                    daySecurity(agency);
+                    client.reserveTrip(agency);
                     System.out.println();
                     break;
                 case 3:
-                    profitToAdd -= client.cancelReserve();
-                    agency.setProfit(profitToAdd);
+                    client.cancelReserve(agency);
                     System.out.println();
                     break;
                 case 4:
@@ -298,6 +333,7 @@ public class Agency implements Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 6:
+                    daySecurity(agency);
                     client.leaveWaitingList(agency);
                     System.out.println();
                     break;
@@ -361,7 +397,7 @@ public class Agency implements Ficheiro, Menu{
         double profit = 0;
         Agency agencia = new Agency(users, trips, buses, profit);
 
-        Date date = new Date(1 ,1 ,4 ,12 ,2015);
+        Date date = new Date(1 ,1 ,15 ,12 ,2015);
         Bus bus = new Bus("1", 2);
         Bus bus2 = new Bus("2", 2);
         buses.add(bus);
@@ -377,7 +413,7 @@ public class Agency implements Ficheiro, Menu{
         ArrayList<Reserve> reserves7 = new ArrayList<>();
         ArrayList<Reserve> reserves8 = new ArrayList<>();
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
-        Premium premium1 = new Premium("Machado1", "2", "2", "mail2", "324342", "isto2", 2);
+        Regular premium1 = new Regular("Machado1", "2", "2", "mail2", "324342", "isto2", 2);
         Premium premium2 = new Premium("Machado2", "3", "3", "mail3", "324343", "isto3", 2);
         Premium premium3 = new Premium("Machado3", "4", "4", "mail4", "324344", "isto4", 2);
         Premium premium4 = new Premium("Machad4", "5", "5", "mail5", "324345", "isto5", 2);
