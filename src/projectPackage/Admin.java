@@ -76,6 +76,8 @@ public class Admin extends User {
 
     public void deleteUser(Agency agency) {
         ArrayList<User> users = agency.getUsers();
+        ArrayList<Trip> trips = agency.getTrips();
+        int index, indexTrip;
         Scanner input = new Scanner(System.in);
         String nif;
 
@@ -85,16 +87,37 @@ public class Admin extends User {
             System.out.println("NIF  doesn't exist, NIF of user to delete:");
         }
 
+        index = indexOfClient(users, nif);
+        User user = users.get(index);
 
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getNif().equals(nif)) {
-                users.remove(i);
-                agency.setUsers(users);
-                System.out.println("Client sucefully removed");
-                return;
+        if (user.getType() == 2 || user.getType() == 3) {
+            Client client = (Client) users.get(index);
+
+            for (Reserve clientReserve : client.getClientReserves()) {
+                Trip tripOfReserve = clientReserve.getTrip();
+                indexTrip = indexOfTrip(trips, tripOfReserve.getCode());
+                int tripCode = tripOfReserve.getCode();
+                ArrayList<Reserve> tripReserves = trips.get(indexTrip).getReservesOfTrip();
+
+                for (Reserve reserveTrip : tripReserves) {
+                    int reserveTripCode = reserveTrip.getTrip().getCode();
+                    String reserveClientNif = reserveTrip.getClient().getNif();
+
+                    if (reserveTripCode == tripCode && reserveClientNif.equals(client.getNif()))
+                        reserveTrip.setState(false);
+                }
+
             }
+
+            users.remove(index);
+            agency.setUsers(users);
+            System.out.println("Client sucefully removed");
         }
-        System.out.println("Client not found");
+        else {
+            users.remove(index);
+            agency.setUsers(users);
+            System.out.println("Client sucefully removed");
+        }
     }
 
     public void modifyUser(Agency agency) {
@@ -133,30 +156,30 @@ public class Admin extends User {
                 System.out.print("Client's new name: ");
                 name = input.nextLine();
 
-                System.out.print("Client's NIF: ");
+                System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
                 while (checkIfNifExists(users, nif)) {
                     System.out.print("Invalid input, NIF of client you want to  modify: ");
                     nif = input.nextLine();
                 }
 
-                System.out.print("Client's address: ");
+                System.out.print("Client's new address: ");
                 address = input.nextLine();
 
-                System.out.print("Client's email: ");
+                System.out.print("Client's new email: ");
                 email = input.nextLine();
                 while (checkIfEmailExists(users, email)) {
                     System.out.println("Email already exists, client email: ");
                     email = input.nextLine();
                 }
 
-                System.out.print("Client's phone number:");
+                System.out.print("Client's new phone number:");
                 phone = input.nextLine();
 
-                System.out.print("Client's password: ");
+                System.out.print("Client's new password: ");
                 password = input.nextLine();
 
-                System.out.print("Client's type: ");
+                System.out.print("Client's new type: ");
                 strInput = input.nextLine();
                 while (!typeSecurity(strInput)) {
                     System.out.print("Invalid Input, client's type: ");
@@ -181,6 +204,10 @@ public class Admin extends User {
             case 2:
                 System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
+                while (checkIfNifExists(users, nif)) {
+                    System.out.print("Invalid input, NIF of client you want to  modify: ");
+                    nif = input.nextLine();
+                }
                 users.get(index).setNif(nif);
                 agency.setUsers(users);
                 break;
@@ -193,6 +220,10 @@ public class Admin extends User {
             case 4:
                 System.out.print("Client's new email: ");
                 email = input.nextLine();
+                while (checkIfEmailExists(users, email)) {
+                    System.out.println("Email already exists, client email: ");
+                    email = input.nextLine();
+                }
                 users.get(index).setEmail(email);
                 agency.setUsers(users);
                 break;
@@ -287,23 +318,23 @@ public class Admin extends User {
         System.out.print("Trip new year: ");
         strInput = input.nextLine();
         while (!dateYearSecurity(strInput)) {
-            System.out.print("Invalid input, trip new year: ");
+            System.out.print("Invalid input, trip year: ");
             strInput = input.nextLine();
         }
         year = Integer.parseInt(strInput);
 
         System.out.print("Trip new month: ");
         strInput = input.nextLine();
-        while (!dateMonthSecurity(strInput)) {
-            System.out.print("Invalid input, trip new month: ");
+        while (!dateMonthSecurity(strInput, year)) {
+            System.out.print("Invalid input, trip month: ");
             strInput = input.nextLine();
         }
         month = Integer.parseInt(strInput);
 
         System.out.print("Trip new day: ");
         strInput = input.nextLine();
-        while (!dateDaySecurity(strInput, month)) {
-            System.out.print("Invalid input, trip new day: ");
+        while (!dateDaySecurity(strInput, month, year)) {
+            System.out.print("Invalid input, trip day: ");
             strInput = input.nextLine();
         }
         day = Integer.parseInt(strInput);
@@ -311,7 +342,7 @@ public class Admin extends User {
         System.out.print("Trip new hour: ");
         strInput = input.nextLine();
         while (!dateHourSecurity(strInput)) {
-            System.out.print("Invalid input, trip new hour: ");
+            System.out.print("Invalid input, trip hour: ");
             strInput = input.nextLine();
         }
         hour = Integer.parseInt(strInput);
@@ -319,7 +350,7 @@ public class Admin extends User {
         System.out.print("Trip new minute: ");
         strInput = input.nextLine();
         while (!dateMinuteSecurity(strInput)) {
-            System.out.print("Invalid input, trip new minute: ");
+            System.out.print("Invalid input, tripr minute: ");
             strInput = input.nextLine();
         }
         minute = Integer.parseInt(strInput);
@@ -336,9 +367,9 @@ public class Admin extends User {
         ArrayList<Bus> newTripBuses = new ArrayList<>(numBuses);
 
         for (int i = 0; i < numBuses; i++) {
-            int choice;
+            int choice, index;
             System.out.print("[1] --> Add a existing bus to the trip\t" +
-                             "[2] --> Create a new bus\n"               +
+                             "[2] --> xCreate a new bus\n"               +
                              "What do you wish to do: ");
             strInput = input.nextLine();
             while(!generalSecurity(strInput)) {
@@ -356,7 +387,7 @@ public class Admin extends User {
                         System.out.print("License plate not found, license plate of the bus: ");
                         strInput = input.nextLine();
                     }
-                    int index = indexOfBus(buses, strInput);
+                    index = indexOfBus(buses, strInput);
 
                     newTripBuses.add(buses.get(index));
                     break;
@@ -391,6 +422,16 @@ public class Admin extends User {
 
         index = indexOfTrip(trips, code);
 
+        ArrayList<Reserve> reserves = trips.get(index).getReservesOfTrip();
+
+        for (Reserve reserve : reserves) {
+            if (reserve.getState()) {
+                System.out.println("Trips that have active reservations can't be deleted");
+                return;
+            }
+        }
+        trips.remove(index);
+        agency.setTrips(trips);
     }
 
     public void modifyTrip(Agency agency) {
@@ -469,7 +510,7 @@ public class Admin extends User {
 
                 System.out.print("Trip new month: ");
                 strInput = input.nextLine();
-                while (!dateMonthSecurity(strInput)) {
+                while (!dateMonthSecurity(strInput, year)) {
                     System.out.print("Invalid input, trip new month: ");
                     strInput = input.nextLine();
                 }
@@ -477,7 +518,7 @@ public class Admin extends User {
 
                 System.out.print("Trip new day: ");
                 strInput = input.nextLine();
-                while (!dateDaySecurity(strInput, month)) {
+                while (!dateDaySecurity(strInput, month, year)) {
                     System.out.print("Invalid input, trip new day: ");
                     strInput = input.nextLine();
                 }
@@ -563,7 +604,7 @@ public class Admin extends User {
                 year = Integer.parseInt(strInput);
                 System.out.print("Trip new month: ");
                 strInput = input.nextLine();
-                while (!dateMonthSecurity(strInput)) {
+                while (!dateMonthSecurity(strInput, year)) {
                     System.out.print("Invalid input, trip new month: ");
                     strInput = input.nextLine();
                 }
@@ -571,7 +612,7 @@ public class Admin extends User {
 
                 System.out.print("Trip new day: ");
                 strInput = input.nextLine();
-                while (!dateDaySecurity(strInput, month)) {
+                while (!dateDaySecurity(strInput, month, year  )) {
                     System.out.print("Invalid input, trip new day: ");
                     strInput = input.nextLine();
                 }
@@ -651,25 +692,17 @@ public class Admin extends User {
             System.out.print("License plate not found, license plate of bus to modify: ");
             licensePlate = input.nextLine();
         }
+        int index = indexOfBus(buses, licensePlate);
 
-        for (int i = 0; i < buses.size(); i++) {
-            Bus bus = buses.get(i);
-            String busLicensePlate = bus.getLicensePlate();
-
-            if (busLicensePlate.equals(licensePlate)) {
-                for (boolean seat : bus.getTakenSeats()) {
-                    if (seat) {
-                        System.out.println("Bus has clients with seats reserved");
-                        return;
-                    }
-                }
-                buses.remove(i);
-                agency.setBuses(buses);
-                System.out.println("Bus sucefully removed");
+        Bus bus = buses.get(index);
+        for (boolean seat : bus.getTakenSeats()) {
+            if (seat) {
+                System.out.println("Bus is reserved by a client");
                 return;
             }
         }
-        System.out.println("Bus not found");
+        buses.remove(index);
+        agency.setBuses(buses);
     }
 
     public void modifyBus(Agency agency) {
@@ -751,7 +784,7 @@ public class Admin extends User {
 
         System.out.print("Month: ");
         strInput = input.nextLine();
-        while (!dateMonthSecurity(strInput)) {
+        while (!monthSecurity(strInput)) {
             System.out.print("Invalid input, month:");
             strInput = input.nextLine();
         }
@@ -779,7 +812,7 @@ public class Admin extends User {
 
         System.out.print("Month: ");
         strInput = input.nextLine();
-        while (!dateMonthSecurity(strInput)) {
+        while (!monthSecurity(strInput)) {
             System.out.print("Invalid input, month:");
             strInput = input.nextLine();
         }
@@ -810,7 +843,7 @@ public class Admin extends User {
 
         System.out.print("Month: ");
         strInput = input.nextLine();
-        while (!dateMonthSecurity(strInput)) {
+        while (!monthSecurity(strInput)) {
             System.out.print("Invalid input, month:");
             strInput = input.nextLine();
         }
@@ -842,7 +875,7 @@ public class Admin extends User {
 
         for (Reserve reserve : trip.getReservesOfTrip()) {
             if (reserve.getState())
-                System.out.print(reserve);
+                System.out.println(reserve);
         }
     }
 
@@ -866,7 +899,7 @@ public class Admin extends User {
 
         for (Reserve reserve : trip.getReservesOfTrip()) {
             if (!reserve.getState())
-                System.out.print(reserve);
+                System.out.println(reserve);
         }
     }
 
@@ -880,7 +913,7 @@ public class Admin extends User {
 
         System.out.print("Month: ");
         strInput = input.nextLine();
-        while (!dateMonthSecurity(strInput)) {
+        while (!monthSecurity(strInput)) {
             System.out.print("Invalid input, month: ");
             strInput = input.nextLine();
         }

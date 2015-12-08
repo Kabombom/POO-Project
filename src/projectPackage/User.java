@@ -138,28 +138,39 @@ public class User {
         }
     }
 
-    public boolean dateDaySecurity(String strInput, int month) {
+    public boolean dateDaySecurity(String strInput, int month, int year) {
         Calendar calendar = Calendar.getInstance();
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        int currentYear = calendar.get(Calendar.DAY_OF_MONTH);
         try {
             int day = Integer.parseInt(strInput);
             if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
-                return !(day <= 0 || day > 31 || day <= currentDay);
+                return !(day <= 0 || day > 31 || (currentYear == year && day <= currentDay));
             else if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11 )
-                return  !(day <= 0 || day > 30);
+                return  !((day <= 0 || day > 30) || (currentYear == year && day <= currentDay));
         } catch (NumberFormatException e) {
             return false;
         }
         return false;
     }
 
-    public boolean dateMonthSecurity(String strInput) {
+    public boolean monthSecurity(String strInput) {
+        try {
+            int input = Integer.parseInt(strInput);
+            return !((input <= 0 || input > 12));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public boolean dateMonthSecurity(String strInput, int year) {
         Calendar calendar = Calendar.getInstance();
         //Calendar month indexes like an array
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
+        int currentYear = calendar.get(Calendar.YEAR);
         try {
             int input = Integer.parseInt(strInput);
-            return !((input <= 0 || input > 12) || input < currentMonth);
+            return !((input <= 0 || input > 12) || (currentYear == year && input < currentMonth));
         } catch (NumberFormatException e) {
             return false;
         }
@@ -239,7 +250,7 @@ public class User {
     public int indexOfClient(ArrayList<User> users, String nif) {
         int i;
         for (i = 0; i < users.size(); i++) {
-            if (users.get(i).getNif().equals(nif) && users.get(i).getType() != 1)
+            if (users.get(i).getNif().equals(nif))
                 return i;
         }
         return i;

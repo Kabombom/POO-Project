@@ -95,4 +95,19 @@ public class Trip {
         }
         return average/total;
     }
+
+    public void deletedClientReserves(Client client) {
+        ArrayList<Reserve> clientReserves = client.getClientReserves();
+
+        for (Reserve reserve : clientReserves) {
+            Trip trip = reserve.getTrip();
+            int tripCode = trip.getCode();
+
+            for (Reserve tripReserve : reservesOfTrip) {
+                if (tripReserve.getTrip().getCode() == tripCode)
+                    tripReserve.setState(false);
+            }
+
+        }
+    }
 }

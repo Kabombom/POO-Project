@@ -33,7 +33,6 @@ public class Regular extends Client{
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
-        double profit = agency.getProfit();
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
 
@@ -97,7 +96,8 @@ public class Regular extends Client{
 
                 Reserve reserve = new Reserve(this, trip, seatNumber);
                 this.clientReserves.add(reserve);
-                profit += payment(trip);
+                trip.getReservesOfTrip().add(reserve);
+                double profit = agency.getProfit() + payment(trip);
                 agency.setProfit(profit);
             }
         }

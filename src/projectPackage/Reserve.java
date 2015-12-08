@@ -32,9 +32,10 @@ public class Reserve {
     @Override
     public String toString() {
         return "Reserve{" +
-                "client=" + client +
+                "seatNumber=" + seatNumber +
+                ", state=" + state +
                 ", trip=" + trip +
-                ", seatNumber=" + seatNumber +
+                ", client=" + client +
                 '}';
     }
 }

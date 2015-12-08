@@ -99,7 +99,6 @@ public class Premium extends Client {
                 this.clientReserves.add(reserve);
                 trip.getReservesOfTrip().add(reserve);
                 double profit = agency.getProfit() + payment(trip);
-                System.out.println(profit);
                 agency.setProfit(profit);
             }
         }
@@ -177,7 +176,6 @@ public class Premium extends Client {
 
                 reserves.remove(i);
                 System.out.println("Operation Successful");
-                System.out.println(profit);
                 agency.setProfit(profit);
             }
         }

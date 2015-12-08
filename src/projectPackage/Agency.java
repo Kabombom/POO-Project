@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
-//verificar a segurança do dia
 //como notificar waiting list?
 //verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
-//METER NAS SEGURANÇAS UMA FORMA DE SAIR DOS INPUTS
-//TODO waiting list
+//TODO segurança do autocarro a criar viagem para nao haver conflito de datas
 //TODO começar a implementar ficheiros
 //TODO javadocs
 //TODO relatorio
@@ -78,26 +76,12 @@ public class Agency implements Ficheiro, Menu{
         return  line;
     }
 
-    public Object rObject(ObjectInputStream inputStream) {
-        Object toReturn = null;
-        try {
-            toReturn = inputStream.readObject();
-            return toReturn;
-        } catch (ClassNotFoundException e) {
-            System.out.println("Class not found");
-        }
-        catch (IOException e) {
-            System.out.println("General I/O Exception " + e.getMessage());
-        }
-        return toReturn;
+    public Object rObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        return inputStream.readObject();
     }
 
-    public void wObject(ObjectOutputStream outputStream, Object obj) {
-        try {
-            outputStream.writeObject(obj);
-        } catch (IOException e) {
-            System.out.println("General I/O Exception " + e.getMessage());
-        }
+    public void wObject(ObjectOutputStream outputStream, Object obj) throws  IOException {
+        outputStream.writeObject(obj);
     }
 
     public boolean choiceSecurity(String choiceInput) {
@@ -205,7 +189,6 @@ public class Agency implements Ficheiro, Menu{
                     "[10] --> Modify Bus\t\t"               +
                     "[11] --> Delete Bus\n"                 +
                     "[12] --> List Buses\t\t"               +
-                    "[13] --> Logout\n"                     +
                     "What do you wish to do: ");
             strInput = input.nextLine();
             while(!optionsSecurity(strInput)) {
@@ -216,6 +199,7 @@ public class Agency implements Ficheiro, Menu{
 
             switch (choice) {
                 case 0:
+                    menu(agency);
                     return;
                 case 1:
                     admin.createUser(agency);
@@ -229,7 +213,8 @@ public class Agency implements Ficheiro, Menu{
                     break;
                 case 3:
                     admin.deleteUser(agency);
-                    admin.listUsers(agency);
+                    admin.listTripCanceledReserves(agency);
+                    admin.listTripReserves(agency);
                     System.out.println();
                     break;
                 case 4:
@@ -274,9 +259,6 @@ public class Agency implements Ficheiro, Menu{
                     admin.listBuses(agency);
                     System.out.println();
                     break;
-                case 13:
-                    menu(agency);
-                    break;
                 default:
                     System.out.println("Invalid operation");
             }
@@ -292,14 +274,13 @@ public class Agency implements Ficheiro, Menu{
 
         while (true) {
             System.out.print("WELCOME TO THE CLIENT MENU\n"             +
-                    "[0] --> Leave Menu\t\t\t\t\t\t\t\t"                +
+                    "[0] --> Exit\t\t\t\t\t\t\t\t\t"                    +
                     "[1] --> List Avaiable Trips\n"                     +
                     "[2] --> Reserve Trip\t\t\t\t\t\t\t"                +
                     "[3] --> Cancel Reserve\n"                          +
                     "[4] --> List Your Reserves\t\t\t\t\t\t"            +
                     "[5] --> Rate and/or comment trip\n"                +
-                    "[6] --> Reserve trip and leave waiting list\t\t"   +
-                    "[7] --> Logout\n"                                  +
+                    "[6] --> Reserve trip and leave waiting list\n"     +
                     "What do you wish to do: ");
             strInput = input.nextLine();
             while(!optionsSecurity(strInput)) {
@@ -310,6 +291,7 @@ public class Agency implements Ficheiro, Menu{
 
             switch (choice) {
                 case 0:
+                    menu(agency);
                     return;
                 case 1:
                     client.listAvaiableTrips(agency);
@@ -337,10 +319,6 @@ public class Agency implements Ficheiro, Menu{
                     client.leaveWaitingList(agency);
                     System.out.println();
                     break;
-                case 7:
-                    System.out.println();
-                    menu(agency);
-                    break;
                 default:
                     System.out.println("Invalid operation");
             }
@@ -360,32 +338,12 @@ public class Agency implements Ficheiro, Menu{
             client = (Client) user;
             while(true) {
                 clientMenu(agency, client);
-
-                for (User test : users) {
-                    System.out.println(test);
-                }
-                for (Trip test2 : trips) {
-                    System.out.println(test2);
-                }
-                for (Bus test3 : buses) {
-                    System.out.println(test3);
-                }
             }
         }
         else {
             admin = (Admin) user;
             while (true) {
                 adminMenu(agency, admin);
-                for (User test : users) {
-                    System.out.println(test);
-                }
-                for (Trip test2 : trips) {
-                    System.out.println(test2);
-                }
-                for (Bus test3 : buses) {
-                    System.out.println(test3);
-                }
-
             }
         }
     }
@@ -413,24 +371,19 @@ public class Agency implements Ficheiro, Menu{
         ArrayList<Reserve> reserves7 = new ArrayList<>();
         ArrayList<Reserve> reserves8 = new ArrayList<>();
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
-        Regular premium1 = new Regular("Machado1", "2", "2", "mail2", "324342", "isto2", 2);
+        Premium premium1 = new Premium("Machado1", "2", "2", "mail2", "324342", "isto2", 2);
         Premium premium2 = new Premium("Machado2", "3", "3", "mail3", "324343", "isto3", 2);
-        Premium premium3 = new Premium("Machado3", "4", "4", "mail4", "324344", "isto4", 2);
-        Premium premium4 = new Premium("Machad4", "5", "5", "mail5", "324345", "isto5", 2);
-        Premium premium5 = new Premium("Machado5", "6", "6", "mail6", "324346", "isto6", 2);
-        Premium premium6 = new Premium("Machado6", "7", "7", "mail7", "324347", "isto7", 2);
-        Premium premium7 = new Premium("Machado7", "8", "8", "mail8", "324348", "isto8", 2);
-        Premium premium8 = new Premium("Machado8", "9", "9", "mail9", "324349", "isto9", 2);
-
         users.add(admin);
-        users.add(premium1);
         users.add(premium2);
-        users.add(premium3);
-        users.add(premium4);
-        users.add(premium5);
-        users.add(premium6);
-        users.add(premium7);
-        users.add(premium8);
+        users.add(premium1);
+
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("users"));
+            outputStream.writeObject(agencia.getUsers());
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         agencia.menu(agencia);
     }
 }
