@@ -1,5 +1,6 @@
 package projectPackage;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -9,9 +10,9 @@ public class Admin extends User {
         super(name, nif, address, email, phone, password, type);
     }
 
-    public void createUser(Agency agency) {
+    public void createUser(Agency agency) throws IOException {
         ArrayList<User> users = agency.getUsers();
-
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
         int type;
         String name, nif, address, email, phone, password, typeInput;
         Scanner input = new Scanner(System.in);
@@ -58,28 +59,32 @@ public class Admin extends User {
             Admin admin = new Admin(name, nif, address, email, phone, password, type);
             users.add(admin);
             agency.setUsers(users);
+            agency.wObject(oS, users);
             System.out.println("Operation sucefull");
         }
         else if (type == 2) {
             Premium premium = new Premium(name, nif, address, email, phone, password, type);
             users.add(premium);
             agency.setUsers(users);
+            agency.wObject(oS, users);
             System.out.println("Operation sucefull");
         }
         else if (type == 3) {
             Regular regular = new Regular(name, nif, address, email, phone, password, type);
             users.add(regular);
             agency.setUsers(users);
+            agency.wObject(oS, users);
             System.out.println("Operation sucefull");
         }
     }
 
-    public void deleteUser(Agency agency) {
+    public void deleteUser(Agency agency) throws IOException {
         ArrayList<User> users = agency.getUsers();
         ArrayList<Trip> trips = agency.getTrips();
         int index, indexTrip;
         Scanner input = new Scanner(System.in);
         String nif;
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
 
         System.out.print("NIF of user to delete: ");
         nif = input.nextLine();
@@ -111,17 +116,21 @@ public class Admin extends User {
 
             users.remove(index);
             agency.setUsers(users);
+            agency.wObject(oS, users);
             System.out.println("Client sucefully removed");
         }
         else {
             users.remove(index);
             agency.setUsers(users);
+            agency.wObject(oS, users);
             System.out.println("Client sucefully removed");
         }
+        oS.close();
     }
 
-    public void modifyUser(Agency agency) {
+    public void modifyUser(Agency agency) throws IOException {
         Scanner input = new Scanner(System.in);
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
         String strInput, name, nif, address, email, phone, password;
         int choice, type, index;
         ArrayList<User> users = agency.getUsers();
@@ -194,12 +203,14 @@ public class Admin extends User {
                 users.get(index).setPassword(password);
                 users.get(index).setType(type);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 1:
                 System.out.print("Client's new name: ");
                 name = input.nextLine();
                 users.get(index).setName(name);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 2:
                 System.out.print("Client's new NIF: ");
@@ -210,12 +221,14 @@ public class Admin extends User {
                 }
                 users.get(index).setNif(nif);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 3:
                 System.out.print("Client's new address: ");
                 address = input.nextLine();
                 users.get(index).setAddress(address);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 4:
                 System.out.print("Client's new email: ");
@@ -226,18 +239,21 @@ public class Admin extends User {
                 }
                 users.get(index).setEmail(email);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 5:
                 System.out.print("Client's new phone number:");
                 phone = input.nextLine();
                 users.get(index).setPhone(phone);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 6:
                 System.out.print("Client's new password: ");
                 password = input.nextLine();
                 users.get(index).setPassword(password);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             case 7:
                 System.out.print("Client's type: ");
@@ -249,11 +265,13 @@ public class Admin extends User {
                 type = Integer.parseInt(strInput);
                 users.get(index).setType(type);
                 agency.setUsers(users);
+                agency.wObject(oS, users);
                 break;
             default:
                 System.out.println("Invalid Operation");
         }
         System.out.println("Operation sucefull");
+        oS.close();
     }
 
     public void listUsers(Agency agency) {
@@ -276,9 +294,11 @@ public class Admin extends User {
         }
     }
 
-    public void createTrip(Agency agency) {
+    public void createTrip(Agency agency) throws IOException {
         ArrayList<Trip> trips = agency.getTrips();
         ArrayList<Bus> buses = agency.getBuses();
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
+
 
         int code, year, month, day, hour, minute, numBuses;
         double price, duration;
@@ -369,7 +389,7 @@ public class Admin extends User {
         for (int i = 0; i < numBuses; i++) {
             int choice, index;
             System.out.print("[1] --> Add a existing bus to the trip\t" +
-                             "[2] --> xCreate a new bus\n"               +
+                             "[2] --> Create a new bus\n"               +
                              "What do you wish to do: ");
             strInput = input.nextLine();
             while(!generalSecurity(strInput)) {
@@ -392,7 +412,9 @@ public class Admin extends User {
                     newTripBuses.add(buses.get(index));
                     break;
                 case 2:
-                    newTripBuses.add(createBus(agency));
+                    Bus newBus = createBus(agency);
+                    buses.add(newBus);
+                    newTripBuses.add(newBus);
                     break;
                 default:
                     System.out.println("Invalid operation");
@@ -402,14 +424,19 @@ public class Admin extends User {
         Trip trip = new Trip(code, origin, destiny, price, duration, date, newTripBuses);
         trips.add(trip);
         agency.setTrips(trips);
+        agency.wObject(oS, trips);
+        agency.wObject(oS, buses);
+        oS.close();
         System.out.println("Operation sucefull");
     }
 
-    public void deleteTrip(Agency agency) {
+    public void deleteTrip(Agency agency) throws IOException {
         ArrayList<Trip> trips = agency.getTrips();
         int code, index;
         Scanner input = new Scanner(System.in);
         String strInput;
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
+
 
         listTrips(agency);
         System.out.print("Code of Trip to delete: ");
@@ -432,14 +459,17 @@ public class Admin extends User {
         }
         trips.remove(index);
         agency.setTrips(trips);
+        agency.wObject(oS, trips);
+        oS.close();
     }
 
-    public void modifyTrip(Agency agency) {
+    public void modifyTrip(Agency agency) throws IOException {
         int code, index, minute, hour, day, month, year;
         double price, duration;
         String strInput, origin, destiny;
         Date date;
         Scanner input = new Scanner(System.in);
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
         ArrayList<Trip> trips = agency.getTrips();
 
         System.out.print("Code of trip to modify: ");
@@ -458,8 +488,7 @@ public class Admin extends User {
                            "[3] --> Destiny\n"  +
                            "[4] --> Price\n"    +
                            "[5] --> Duration\n" +
-                           "[6] --> Date\n"     +
-                           "[7] --> Buses\n");
+                           "[6] --> Date\n");
         System.out.print("Info of the trip you want to modify: ");
         strInput = input.nextLine();
         while(!optionsSecurity(strInput)) {
@@ -548,6 +577,7 @@ public class Admin extends User {
                 trips.get(index).setDuration(duration);
                 trips.get(index).setDate(date);
                 agency.setTrips(trips);
+                agency.wObject(oS, trips);
                 break;
             case 1:
                 System.out.print("Trip new code: ");
@@ -559,18 +589,21 @@ public class Admin extends User {
                 code = Integer.parseInt(strInput);
                 trips.get(index).setCode(code);
                 agency.setTrips(trips);
+                agency.wObject(oS, trips);
                 break;
             case 2:
                 System.out.print("Trip new origin: ");
                 strInput = input.nextLine();
                 trips.get(index).setOrigin(strInput);
                 agency.setTrips(trips);
+                agency.wObject(oS, trips);
                 break;
             case 3:
                 System.out.print("Trip new destiny: ");
                 strInput = input.nextLine();
                 trips.get(index).setDestiny(strInput);
                 agency.setTrips(trips);
+                agency.wObject(oS, trips);
                 break;
             case 4:
                 System.out.print("Trip new price: ");
@@ -582,6 +615,7 @@ public class Admin extends User {
                 price = Double.parseDouble(strInput);
                 trips.get(index).setPrice(price);
                 agency.setTrips(trips);
+                agency.wObject(oS, trips);
                 break;
             case 5:
                 System.out.print("Trip new duration:");
@@ -593,6 +627,7 @@ public class Admin extends User {
                 duration = Double.parseDouble(strInput);
                 trips.get(index).setDuration(duration);
                 agency.setTrips(trips);
+                agency.wObject(oS, trips);
                 break;
             case 6:
                 System.out.print("Trip new year: ");
@@ -637,21 +672,12 @@ public class Admin extends User {
                 date = new Date(minute, hour, day, month, year);
                 trips.get(index).setDate(date);
                 agency.setTrips(trips);
-                break;
-            case 7:
-                System.out.print("License Plate of bus to modify: ");
-                strInput = input.nextLine();
-
-                for (Bus bus : buses) {
-                    if (bus.getLicensePlate().equals(strInput)) {
-                        modifyBus(agency);
-                        break;
-                    }
-                }
+                agency.wObject(oS, trips);
                 break;
             default:
                 System.out.println("Invalid Operation");
         }
+        oS.close();
         System.out.println("Operation sucefull");
     }
 
@@ -680,10 +706,11 @@ public class Admin extends User {
         return bus;
     }
 
-    public void deleteBus(Agency agency) {
+    public void deleteBus(Agency agency) throws IOException {
         Scanner input = new Scanner(System.in);
         String licensePlate;
         ArrayList<Bus> buses = agency.getBuses();
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
 
         listBuses(agency);
         System.out.print("License plate of bus to delete: ");
@@ -703,13 +730,16 @@ public class Admin extends User {
         }
         buses.remove(index);
         agency.setBuses(buses);
+        agency.wObject(oS, buses);
+        oS.close();
     }
 
-    public void modifyBus(Agency agency) {
+    public void modifyBus(Agency agency) throws IOException {
         int choice, newCapacity, index;
         String strInput, newLicensePlate;
         Scanner input = new Scanner(System.in);
         ArrayList<Bus> buses = agency.getBuses();
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
 
         listBuses(agency);
         System.out.print("License plate of bus to modify: ");
@@ -745,12 +775,14 @@ public class Admin extends User {
                 buses.get(index).setLicensePlate(newLicensePlate);
                 buses.get(index).setCapacity(newCapacity);
                 agency.setBuses(buses);
+                agency.wObject(oS, buses);
                 break;
             case 1:
                 System.out.print("Bus new license plate: ");
                 newLicensePlate = input.nextLine();
                 buses.get(index).setLicensePlate(newLicensePlate);
                 agency.setBuses(buses);
+                agency.wObject(oS, buses);
                 return;
             case 2:
                 System.out.print("Bus new capacity: ");
@@ -762,10 +794,12 @@ public class Admin extends User {
                 newCapacity = Integer.parseInt(strInput);
                 buses.get(index).setCapacity(newCapacity);
                 agency.setBuses(buses);
+                agency.wObject(oS, buses);
                 break;
             default:
                 System.out.println("Invalid Operation");
         }
+        oS.close();
     }
 
     public void listBuses(Agency agency) {
@@ -903,13 +937,14 @@ public class Admin extends User {
         }
     }
 
-    public void averageRatingOfTrip(Agency agency) {
+    public void bestRatingOfTrips(Agency agency) {
         ArrayList<Trip> trips = agency.getTrips();
         int month , tripMonth;
         double bestRating = 0;
         Trip bestTrip = null;
         String strInput;
         Scanner input = new Scanner(System.in);
+        File file = new File("results.txt");
 
         System.out.print("Month: ");
         strInput = input.nextLine();
@@ -932,9 +967,13 @@ public class Admin extends User {
             }
         }
 
-        if (bestTrip != null)
+        if (bestTrip != null) {
             System.out.println("The trip with the best rating in the month " + month + " is" +
-                               bestTrip + " with " + bestRating + " of rating");
+                    bestTrip + " with " + bestRating + " of rating");
+            String line = Double.toString(bestRating);
+            agency.writeOneLine(file, line);
+        }
+
     }
 
     public void listWaitingClients(Agency agency) {

@@ -1,9 +1,10 @@
 package projectPackage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Trip {
+public class Trip implements Serializable{
     //Atributes
     private int code;
     private int[] salesByMonth;

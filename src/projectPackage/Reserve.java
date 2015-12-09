@@ -1,6 +1,8 @@
 package projectPackage;
 
-public class Reserve {
+import java.io.Serializable;
+
+public class Reserve implements Serializable{
     private int seatNumber;
     private boolean state;
     private Trip trip;

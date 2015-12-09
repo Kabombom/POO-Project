@@ -12,7 +12,7 @@ import java.util.Scanner;
 //TODO javadocs
 //TODO relatorio
 
-public class Agency implements Ficheiro, Menu{
+public class Agency implements Serializable, Ficheiro, Menu{
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Trip> trips = new ArrayList<>();
     private ArrayList<Bus> buses = new ArrayList<>();
@@ -43,8 +43,9 @@ public class Agency implements Ficheiro, Menu{
     public void setCurrentDaySells(int[] currentDaySells) { this.currentDaySells = currentDaySells; }
 
     public int[] getDayWithMostSells() { return dayWithMostSells; }
-
     public void setDayWithMostSells(int[] dayWithMostSells) { this.dayWithMostSells = dayWithMostSells; }
+
+
 
     public void writeOneLine(File toWrite, String line) {
         try	{
@@ -80,8 +81,8 @@ public class Agency implements Ficheiro, Menu{
         return inputStream.readObject();
     }
 
-    public void wObject(ObjectOutputStream outputStream, Object obj) throws  IOException {
-        outputStream.writeObject(obj);
+    public void wObject(ObjectOutputStream oS, Object obj) throws  IOException {
+        oS.writeObject(obj);
     }
 
     public boolean choiceSecurity(String choiceInput) {
@@ -100,6 +101,8 @@ public class Agency implements Ficheiro, Menu{
         }
         return null;
     }
+
+
 
     public User login(Agency agency) {
         ArrayList<User> users = agency.getUsers();
@@ -168,11 +171,13 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public void adminMenu(Agency agency, Admin admin) {
+    public void adminMenu(Agency agency, Admin admin) throws IOException {
         ArrayList<Bus> buses = agency.getBuses();
         String strInput;
         int choice;
         Scanner input = new Scanner(System.in);
+        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
+
 
         while(true) {
             System.out.print("WELCOME TO THE ADMIN MENU\n"  +
@@ -243,6 +248,7 @@ public class Agency implements Ficheiro, Menu{
                 case 9:
                     buses.add(admin.createBus(agency));
                     admin.listBuses(agency);
+                    agency.wObject(oS, buses);
                     System.out.println();
                     break;
                 case 10:
@@ -265,7 +271,7 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public void clientMenu(Agency agency, Client client) {
+    public void clientMenu(Agency agency, Client client) throws IOException {
         String strInput;
         int choice;
 
@@ -325,7 +331,7 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public void menu(Agency agency) {
+    public void menu(Agency agency) throws IOException {
         ArrayList<User> users = agency.getUsers();
         ArrayList<Trip> trips = agency.getTrips();
         ArrayList<Bus> buses = agency.getBuses();
@@ -348,12 +354,22 @@ public class Agency implements Ficheiro, Menu{
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         ArrayList<User> users = new ArrayList<>();
         ArrayList<Trip> trips = new ArrayList<>();
         ArrayList<Bus> buses = new ArrayList<>();
         double profit = 0;
         Agency agencia = new Agency(users, trips, buses, profit);
+        ObjectInputStream iS = new ObjectInputStream(new FileInputStream("users"));
+        users = (ArrayList<User>) agencia.rObject(iS);
+        iS.close();
+        iS = new ObjectInputStream(new FileInputStream("users"));
+        trips = (ArrayList<Trip>) agencia.rObject(iS);
+        iS.close();
+        iS = new ObjectInputStream(new FileInputStream("users"));
+        buses = (ArrayList<Bus>) agencia.rObject(iS);
+        iS.close();
+
 
         Date date = new Date(1 ,1 ,15 ,12 ,2015);
         Bus bus = new Bus("1", 2);
@@ -362,28 +378,8 @@ public class Agency implements Ficheiro, Menu{
         buses.add(bus2);
         Trip trip = new Trip(1, "oi", "adeus", 1, 1, date, buses);
         trips.add(trip);
-        ArrayList<Reserve> reserves = new ArrayList<>();
-        ArrayList<Reserve> reserves2 = new ArrayList<>();
-        ArrayList<Reserve> reserves3 = new ArrayList<>();
-        ArrayList<Reserve> reserves4 = new ArrayList<>();
-        ArrayList<Reserve> reserves5 = new ArrayList<>();
-        ArrayList<Reserve> reserves6 = new ArrayList<>();
-        ArrayList<Reserve> reserves7 = new ArrayList<>();
-        ArrayList<Reserve> reserves8 = new ArrayList<>();
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
-        Premium premium1 = new Premium("Machado1", "2", "2", "mail2", "324342", "isto2", 2);
-        Premium premium2 = new Premium("Machado2", "3", "3", "mail3", "324343", "isto3", 2);
         users.add(admin);
-        users.add(premium2);
-        users.add(premium1);
-
-        try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("users"));
-            outputStream.writeObject(agencia.getUsers());
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         agencia.menu(agencia);
     }
 }

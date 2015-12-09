@@ -1,6 +1,8 @@
 package projectPackage;
 
-public class Bus {
+import java.io.Serializable;
+
+public class Bus implements Serializable{
     private String licensePlate;
     private int capacity;
     private boolean[] takenSeats;

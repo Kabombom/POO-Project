@@ -1,9 +1,10 @@
 package projectPackage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class User {
+public class User implements Serializable{
     private String name;
     private String nif;
     private String address;
