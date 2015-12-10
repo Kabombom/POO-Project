@@ -77,6 +77,11 @@ public class Agency implements Serializable, Ficheiro, Menu{
         return  line;
     }
 
+    public boolean checkIfFileEmpty(String filename) throws  IOException {
+        BufferedReader br = new BufferedReader(new FileReader(filename));
+        return br.readLine() == null;
+    }
+
     public Object rObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         return inputStream.readObject();
     }
@@ -171,39 +176,48 @@ public class Agency implements Serializable, Ficheiro, Menu{
         }
     }
 
-    public void adminMenu(Agency agency, Admin admin) throws IOException {
+    public void adminMenu(Agency agency, Admin admin) throws IOException, ClassNotFoundException {
         ArrayList<Bus> buses = agency.getBuses();
         String strInput;
         int choice;
         Scanner input = new Scanner(System.in);
-        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
-
-
-        while(true) {
-            System.out.print("WELCOME TO THE ADMIN MENU\n"  +
-                    "[0] --> Exit\t\t\t"                    +
-                    "[1] --> Create Client\n"               +
-                    "[2] --> Modify Client\t"               +
-                    "[3] --> Delete Client\n"               +
-                    "[4] --> List Clients\t"                +
-                    "[5] --> Create Trip\n"                 +
-                    "[6] --> Modify Trip\t\t"               +
-                    "[7] --> Delete Trip\n"                 +
-                    "[8] --> List Trips\t\t"                +
-                    "[9] --> Create Bus\n"                  +
-                    "[10] --> Modify Bus\t\t"               +
-                    "[11] --> Delete Bus\n"                 +
-                    "[12] --> List Buses\t\t"               +
+        while (true) {
+            System.out.print("WELCOME TO THE ADMIN MENU\n" +
+                    "[0] --> Exit\t\t\t" +
+                    "[1] --> Create Client\n" +
+                    "[2] --> Modify Client\t" +
+                    "[3] --> Delete Client\n" +
+                    "[4] --> List Clients\t" +
+                    "[5] --> Create Trip\n" +
+                    "[6] --> Modify Trip\t\t" +
+                    "[7] --> Delete Trip\n" +
+                    "[8] --> List Trips\t\t" +
+                    "[9] --> Create Bus\n" +
+                    "[10] --> Modify Bus\t\t" +
+                    "[11] --> Delete Bus\n" +
+                    "[12] --> List Buses\t\t" +
                     "What do you wish to do: ");
             strInput = input.nextLine();
-            while(!optionsSecurity(strInput)) {
+            while (!optionsSecurity(strInput)) {
                 System.out.print("Invalid input, What do you wish to do:");
                 strInput = input.nextLine();
             }
             choice = Integer.parseInt(strInput);
 
+            ObjectOutputStream oSU = null;
+            ObjectOutputStream oST = null;
+            ObjectOutputStream oSB = null;
             switch (choice) {
                 case 0:
+                    oSU = new ObjectOutputStream(new FileOutputStream("users"));
+                    oST = new ObjectOutputStream(new FileOutputStream("trips"));
+                    oSB = new ObjectOutputStream(new FileOutputStream("buses"));
+                    agency.wObject(oSU, agency.getUsers());
+                    oSU.close();
+                    agency.wObject(oST, agency.getTrips());
+                    oST.close();
+                    agency.wObject(oSB, agency.getBuses());
+                    oSB.close();
                     menu(agency);
                     return;
                 case 1:
@@ -246,9 +260,12 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 9:
+                    oSB = new ObjectOutputStream(new FileOutputStream("buses"));
                     buses.add(admin.createBus(agency));
+                    agency.setBuses(buses);
                     admin.listBuses(agency);
-                    agency.wObject(oS, buses);
+                    agency.wObject(oSB , buses);
+                    oSB.close();
                     System.out.println();
                     break;
                 case 10:
@@ -267,29 +284,28 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     break;
                 default:
                     System.out.println("Invalid operation");
+                }
             }
-        }
     }
 
-    public void clientMenu(Agency agency, Client client) throws IOException {
+    public void clientMenu(Agency agency, Client client) throws IOException, ClassNotFoundException {
         String strInput;
         int choice;
 
         double profitToAdd = this.getProfit();
         Scanner input = new Scanner(System.in);
-
         while (true) {
-            System.out.print("WELCOME TO THE CLIENT MENU\n"             +
-                    "[0] --> Exit\t\t\t\t\t\t\t\t\t"                    +
-                    "[1] --> List Avaiable Trips\n"                     +
-                    "[2] --> Reserve Trip\t\t\t\t\t\t\t"                +
-                    "[3] --> Cancel Reserve\n"                          +
-                    "[4] --> List Your Reserves\t\t\t\t\t\t"            +
-                    "[5] --> Rate and/or comment trip\n"                +
-                    "[6] --> Reserve trip and leave waiting list\n"     +
+            System.out.print("WELCOME TO THE CLIENT MENU\n" +
+                    "[0] --> Exit\t\t\t\t\t\t\t\t\t" +
+                    "[1] --> List Avaiable Trips\n" +
+                    "[2] --> Reserve Trip\t\t\t\t\t\t\t" +
+                    "[3] --> Cancel Reserve\n" +
+                    "[4] --> List Your Reserves\t\t\t\t\t\t" +
+                    "[5] --> Rate and/or comment trip\n" +
+                    "[6] --> Reserve trip and leave waiting list\n" +
                     "What do you wish to do: ");
             strInput = input.nextLine();
-            while(!optionsSecurity(strInput)) {
+            while (!optionsSecurity(strInput)) {
                 System.out.print("Invalid input, What do you wish to do:");
                 strInput = input.nextLine();
             }
@@ -297,6 +313,15 @@ public class Agency implements Serializable, Ficheiro, Menu{
 
             switch (choice) {
                 case 0:
+                    ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
+                    ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
+                    ObjectOutputStream oSB = new ObjectOutputStream(new FileOutputStream("buses"));
+                    agency.wObject(oSU, agency.getUsers());
+                    oSU.close();
+                    agency.wObject(oST, agency.getTrips());
+                    oST.close();
+                    agency.wObject(oSB, agency.getBuses());
+                    oSB.close();
                     menu(agency);
                     return;
                 case 1:
@@ -331,26 +356,31 @@ public class Agency implements Serializable, Ficheiro, Menu{
         }
     }
 
-    public void menu(Agency agency) throws IOException {
+    public void menu(Agency agency) throws IOException, ClassNotFoundException {
         ArrayList<User> users = agency.getUsers();
         ArrayList<Trip> trips = agency.getTrips();
         ArrayList<Bus> buses = agency.getBuses();
-
         Client client;
         Admin admin;
         User user = login(agency);
 
-        if (user.getType() == 2 || user.getType() == 3) {
-            client = (Client) user;
-            while(true) {
-                clientMenu(agency, client);
+        if (user == null)
+            return;
+
+        try {
+            if (user.getType() == 2 || user.getType() == 3) {
+                client = (Client) user;
+                while (true) {
+                    clientMenu(agency, client);
+                }
+            } else {
+                admin = (Admin) user;
+                while (true) {
+                    adminMenu(agency, admin);
+                }
             }
-        }
-        else {
-            admin = (Admin) user;
-            while (true) {
-                adminMenu(agency, admin);
-            }
+        } catch (InterruptedIOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -360,26 +390,39 @@ public class Agency implements Serializable, Ficheiro, Menu{
         ArrayList<Bus> buses = new ArrayList<>();
         double profit = 0;
         Agency agencia = new Agency(users, trips, buses, profit);
-        ObjectInputStream iS = new ObjectInputStream(new FileInputStream("users"));
-        users = (ArrayList<User>) agencia.rObject(iS);
-        iS.close();
-        iS = new ObjectInputStream(new FileInputStream("users"));
-        trips = (ArrayList<Trip>) agencia.rObject(iS);
-        iS.close();
-        iS = new ObjectInputStream(new FileInputStream("users"));
-        buses = (ArrayList<Bus>) agencia.rObject(iS);
-        iS.close();
-
-
-        Date date = new Date(1 ,1 ,15 ,12 ,2015);
-        Bus bus = new Bus("1", 2);
-        Bus bus2 = new Bus("2", 2);
-        buses.add(bus);
-        buses.add(bus2);
-        Trip trip = new Trip(1, "oi", "adeus", 1, 1, date, buses);
-        trips.add(trip);
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
+
+        if (!agencia.checkIfFileEmpty("users")) {
+            ObjectInputStream iS = new ObjectInputStream(new FileInputStream("users"));
+            try {
+                users = (ArrayList<User>) agencia.rObject(iS);
+                iS.close();
+            } catch (EOFException e) {
+                System.out.println(e.toString());
+            }
+        }
+        if (!agencia.checkIfFileEmpty("trips")) {
+            ObjectInputStream iS = new ObjectInputStream(new FileInputStream("trips"));
+            try {
+                trips = (ArrayList<Trip>) agencia.rObject(iS);
+                iS.close();
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }
+        }
+        if (!agencia.checkIfFileEmpty("buses")) {
+            ObjectInputStream iS = new ObjectInputStream(new FileInputStream("buses"));
+            try {
+                buses = (ArrayList<Bus>) agencia.rObject(iS);
+                iS.close();
+            } catch (EOFException e) {
+                System.out.println(e.toString());
+            }
+        }
         users.add(admin);
+        agencia.setUsers(users);
+        agencia.setTrips(trips);
+        agencia.setBuses(buses);
         agencia.menu(agencia);
     }
 }

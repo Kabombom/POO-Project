@@ -45,4 +45,15 @@ public class Date implements Serializable{
     public void setYear(int year) {
         this.year = year;
     }
+
+    @Override
+    public String toString() {
+        return "Date{" +
+                "minute=" + minute +
+                ", hour=" + hour +
+                ", day=" + day +
+                ", month=" + month +
+                ", year=" + year +
+                '}';
+    }
 }

@@ -1,5 +1,7 @@
 package projectPackage;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public abstract class Client extends User{
@@ -21,12 +23,12 @@ public abstract class Client extends User{
     public void setTripsBoughtByMonth(int[] tripsBoughtByMonth) { this.tripsBoughtByMonth = tripsBoughtByMonth; }
 
     public abstract void listAvaiableTrips(Agency agency);
-    public abstract void reserveTrip(Agency agency);
+    public abstract void reserveTrip(Agency agency) throws IOException;
     public abstract void listReserves();
-    public abstract void cancelReserve(Agency agency);
-    public abstract void addCommentTrip(Agency agency);
+    public abstract void cancelReserve(Agency agency) throws IOException;
+    public abstract void addCommentTrip(Agency agency) throws IOException;
     public abstract void listCommentsTrip(Agency agency);
-    public abstract void leaveWaitingList(Agency agency);
+    public abstract void leaveWaitingList(Agency agency) throws IOException;
     public abstract double payment(Trip trip);
 
 }

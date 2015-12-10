@@ -1,5 +1,9 @@
 package projectPackage;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
@@ -28,9 +32,10 @@ public class Premium extends Client {
         }
     }
 
-    public void reserveTrip(Agency agency) {
+    public void reserveTrip(Agency agency) throws IOException {
         ArrayList<Trip> trips = agency.getTrips();
-
+        ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
+        ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
@@ -100,6 +105,10 @@ public class Premium extends Client {
                 trip.getReservesOfTrip().add(reserve);
                 double profit = agency.getProfit() + payment(trip);
                 agency.setProfit(profit);
+                agency.wObject(oST, agency.getTrips());
+                oST.close();
+                agency.wObject(oSU, agency.getUsers());
+                oSU.close();
             }
         }
     }
@@ -127,13 +136,12 @@ public class Premium extends Client {
         }
     }
 
-    public void cancelReserve(Agency agency) {
+    public void cancelReserve(Agency agency) throws IOException {
         int code, tripCode, differenceOfDates;
         double profit = agency.getProfit();
         //Getting current date
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
-
         String strInput;
         Scanner input = new Scanner(System.in);
         Reserve reserve;
@@ -157,7 +165,7 @@ public class Premium extends Client {
 
             if (tripCode == code) {
                 firstBus = trip.getBuses().get(0);
-                differenceOfDates = compareDates(calendar, trip.getDate());
+                differenceOfDates = compareWithCurrentDate(calendar, trip.getDate());
                 System.out.println(differenceOfDates);
                 if (differenceOfDates > 2)
                     profit -= payment(trip);
@@ -177,11 +185,17 @@ public class Premium extends Client {
                 reserves.remove(i);
                 System.out.println("Operation Successful");
                 agency.setProfit(profit);
+                ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
+                ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
+                agency.wObject(oST, agency.getTrips());
+                oST.close();
+                agency.wObject(oSU, agency.getUsers());
+                oSU.close();
             }
         }
     }
 
-    public void addCommentTrip(Agency agency) {
+    public void addCommentTrip(Agency agency) throws IOException {
         ArrayList<Trip> trips = agency.getTrips();
         int code, index;
         double rating;
@@ -214,6 +228,9 @@ public class Premium extends Client {
         coments = trips.get(index).getComents();
         coments.add(coment);
         trips.get(index).setComents(coments);
+        ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
+        agency.wObject(oST, agency.getTrips());
+        oST.close();
     }
 
     public void listCommentsTrip(Agency agency) {
@@ -238,7 +255,7 @@ public class Premium extends Client {
             System.out.println(coment);
     }
 
-    public void leaveWaitingList(Agency agency) {
+    public void leaveWaitingList(Agency agency) throws IOException {
         ArrayList<Trip> trips = agency.getTrips();
 
         for (Trip trip : trips) {
@@ -249,6 +266,9 @@ public class Premium extends Client {
                 if (toCompare == this) {
                     waitingList.remove(i);
                     trip.setWaitingList(waitingList);
+                    ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
+                    agency.wObject(oST, agency.getTrips());
+                    oST.close();
                     reserveTrip(agency);
                 }
             }

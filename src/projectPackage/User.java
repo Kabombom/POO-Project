@@ -248,6 +248,18 @@ public class User implements Serializable{
         return false;
     }
 
+    public boolean checkIfBusHasTrip(ArrayList<Trip> trips, ArrayList<Bus> buses, Bus bus, Date date) {
+        for (Trip trip : trips) {
+            ArrayList<Bus> tripBuses = trip.getBuses();
+            for (Bus tripBus : tripBuses) {
+                if (tripBus == bus) {
+                    Date tripDate = trip.getDate();
+                }
+            }
+        }
+        return false;
+    }
+
     public int indexOfClient(ArrayList<User> users, String nif) {
         int i;
         for (i = 0; i < users.size(); i++) {
@@ -275,7 +287,7 @@ public class User implements Serializable{
         return i;
     }
 
-    public int compareDates(Calendar calendar, Date date) {
+    public int compareWithCurrentDate(Calendar calendar, Date date) {
         int currentYear = calendar.get(Calendar.YEAR);
         //Months of class calendar are indexed array like
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
@@ -289,4 +301,6 @@ public class User implements Serializable{
 
         return tripDate - currentDate;
     }
+
+
 }
