@@ -1030,6 +1030,7 @@ public class Admin extends User {
     }
 
     public void listDayWithMostSells(Agency agency) {
-
+        int[] stats = agency.getStats();
+        System.out.println("There were mosts sells was in " + stats[0] + "/" + stats[1] + "/" + stats[2] + " with " + stats[3] + "trips sold");
     }
 }

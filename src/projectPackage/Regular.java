@@ -1,9 +1,6 @@
 package projectPackage;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
@@ -94,6 +91,26 @@ public class Regular extends Client{
                 for (Bus bus : trip.getBuses())
                     bus.addTakenSeat(seatNumber);
 
+                agency.getCurrentDaySells()[3]++;
+                if (agency.getCurrentDaySells()[3] > agency.getStats()[3]) {
+                    agency.setStats(agency.getCurrentDaySells());
+                    String year = Integer.toString(agency.getCurrentDaySells()[0]);
+                    String month = Integer.toString(agency.getCurrentDaySells()[1]);
+                    String day = Integer.toString(agency.getCurrentDaySells()[2]);
+                    String sells = Integer.toString(agency.getCurrentDaySells()[3]);
+                    String line = year + "," + month + "," + day + "," +  sells;
+                    File file = new File("stats.txt");
+                    agency.writeOneLine(file, line);
+                } else {
+                    String year = Integer.toString(agency.getCurrentDaySells()[0]);
+                    String month = Integer.toString(agency.getCurrentDaySells()[1]);
+                    String day = Integer.toString(agency.getCurrentDaySells()[2]);
+                    String sells = Integer.toString(agency.getCurrentDaySells()[3]);
+                    String line = year + "," + month + "," + day + "," +  sells;
+                    File file = new File("stats.txt");
+                    agency.writeOneLine(file, line);
+                }
+
                 trip.getSalesByMonth()[currentMonth]++;
                 this.getTripsBoughtByMonth()[currentMonth]++;
 
@@ -172,6 +189,7 @@ public class Regular extends Client{
                 if (checkIfTripFull(firstBus))
                         reserve.getTrip().notifyWaitingList();
 
+                agency.getCurrentDaySells()[3]--;
                 trip.getSalesByMonth()[currentMonth]--;
                 this.getTripsBoughtByMonth()[currentMonth]--;
 

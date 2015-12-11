@@ -1,9 +1,6 @@
 package projectPackage;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
@@ -33,9 +30,8 @@ public class Premium extends Client {
     }
 
     public void reserveTrip(Agency agency) throws IOException {
+        System.out.println(agency.getCurrentDaySells()[0] + " ola");
         ArrayList<Trip> trips = agency.getTrips();
-        ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
-        ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
         Scanner input = new Scanner(System.in);
         String strInput;
         int tripCode, choice;
@@ -97,6 +93,26 @@ public class Premium extends Client {
                 for (Bus bus : trip.getBuses())
                     bus.addTakenSeat(seatNumber);
 
+                agency.getCurrentDaySells()[3]++;
+                if (agency.getCurrentDaySells()[3] > agency.getStats()[3]) {
+                    agency.setStats(agency.getCurrentDaySells());
+                    String year = Integer.toString(agency.getCurrentDaySells()[0]);
+                    String month = Integer.toString(agency.getCurrentDaySells()[1]);
+                    String day = Integer.toString(agency.getCurrentDaySells()[2]);
+                    String sells = Integer.toString(agency.getCurrentDaySells()[3]);
+                    String line = year + "," + month + "," + day + "," +  sells;
+                    File file = new File("stats.txt");
+                    agency.writeOneLine(file, line);
+                } else {
+                    String year = Integer.toString(agency.getCurrentDaySells()[0]);
+                    String month = Integer.toString(agency.getCurrentDaySells()[1]);
+                    String day = Integer.toString(agency.getCurrentDaySells()[2]);
+                    String sells = Integer.toString(agency.getCurrentDaySells()[3]);
+                    String line = year + "," + month + "," + day + "," +  sells;
+                    File file = new File("stats.txt");
+                    agency.writeOneLine(file, line);
+                }
+
                 trip.getSalesByMonth()[currentMonth]++;
                 this.getTripsBoughtByMonth()[currentMonth]++;
 
@@ -105,6 +121,9 @@ public class Premium extends Client {
                 trip.getReservesOfTrip().add(reserve);
                 double profit = agency.getProfit() + payment(trip);
                 agency.setProfit(profit);
+
+                ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
+                ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
                 agency.wObject(oST, agency.getTrips());
                 oST.close();
                 agency.wObject(oSU, agency.getUsers());
@@ -173,6 +192,7 @@ public class Premium extends Client {
                 if (checkIfTripFull(firstBus))
                     reserve.getTrip().notifyWaitingList();
 
+                agency.getCurrentDaySells()[3]--;
                 trip.getSalesByMonth()[currentMonth]--;
                 this.getTripsBoughtByMonth()[currentMonth]--;
 

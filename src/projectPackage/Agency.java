@@ -17,14 +17,16 @@ public class Agency implements Serializable, Ficheiro, Menu{
     private ArrayList<Trip> trips = new ArrayList<>();
     private ArrayList<Bus> buses = new ArrayList<>();
     private double profit;
-    private int[] currentDaySells = new int[2];
-    private int[] dayWithMostSells = new int[2];
+    private int[] stats;
+    private int[] currentDaySells;
 
-    public Agency(ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses, double profit) {
+    public Agency(ArrayList<User> users, ArrayList<Trip> trips, ArrayList<Bus> buses, int[] currentDaySells) {
         this.users = users;
         this.trips = trips;
         this.buses = buses;
-        this.profit = profit;
+        this.profit = 0;
+        this.stats = new int[4];
+        this.currentDaySells = currentDaySells;
     }
 
     public ArrayList<User> getUsers() { return users; }
@@ -42,10 +44,8 @@ public class Agency implements Serializable, Ficheiro, Menu{
     public int[] getCurrentDaySells() { return currentDaySells; }
     public void setCurrentDaySells(int[] currentDaySells) { this.currentDaySells = currentDaySells; }
 
-    public int[] getDayWithMostSells() { return dayWithMostSells; }
-    public void setDayWithMostSells(int[] dayWithMostSells) { this.dayWithMostSells = dayWithMostSells; }
-
-
+    public int[] getStats() { return stats; }
+    public void setStats(int[] stats) { this.stats = stats; }
 
     public void writeOneLine(File toWrite, String line) {
         try	{
@@ -143,30 +143,6 @@ public class Agency implements Serializable, Ficheiro, Menu{
         return null;
     }
 
-    public void daySecurity(Agency agency) {
-        int[] currentDaySells = agency.getCurrentDaySells();
-        int[] dayWithMostSells = agency.getDayWithMostSells();
-        Calendar calendar = Calendar.getInstance();
-        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        System.out.println(currentDay);
-        if (currentDaySells[0] == currentDay)
-            currentDaySells[1]++;
-        else {
-            if (currentDaySells[1] > dayWithMostSells[1]) {
-                dayWithMostSells[0] = currentDaySells[0];
-                dayWithMostSells[1] = currentDaySells[1];
-                currentDaySells[0] = currentDay;
-                currentDaySells[1] = 0;
-                agency.setCurrentDaySells(currentDaySells);
-                agency.setDayWithMostSells(dayWithMostSells);
-            } else {
-                currentDaySells[0] = currentDay;
-                currentDaySells[1] = 0;
-                agency.setCurrentDaySells(currentDaySells);
-            }
-        }
-    }
-
     public boolean optionsSecurity(String  strInput) {
         try {
             int choice = Integer.parseInt(strInput);
@@ -260,10 +236,10 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 9:
-                    oSB = new ObjectOutputStream(new FileOutputStream("buses"));
                     buses.add(admin.createBus(agency));
                     agency.setBuses(buses);
                     admin.listBuses(agency);
+                    oSB = new ObjectOutputStream(new FileOutputStream("buses"));
                     agency.wObject(oSB , buses);
                     oSB.close();
                     System.out.println();
@@ -329,8 +305,8 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 2:
-                    daySecurity(agency);
                     client.reserveTrip(agency);
+                    System.out.println(agency.getStats()[3]);
                     System.out.println();
                     break;
                 case 3:
@@ -346,7 +322,6 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 6:
-                    daySecurity(agency);
                     client.leaveWaitingList(agency);
                     System.out.println();
                     break;
@@ -388,8 +363,19 @@ public class Agency implements Serializable, Ficheiro, Menu{
         ArrayList<User> users = new ArrayList<>();
         ArrayList<Trip> trips = new ArrayList<>();
         ArrayList<Bus> buses = new ArrayList<>();
-        double profit = 0;
-        Agency agencia = new Agency(users, trips, buses, profit);
+
+        //Get current date
+        Calendar  rightNow = Calendar.getInstance();
+        int year = rightNow.get(Calendar.YEAR);
+        int month = rightNow.get(Calendar.MONTH) + 1;
+        int day = rightNow.get(Calendar.DAY_OF_MONTH);
+        int[] actualDate = new int[4];
+        actualDate[0] = year;
+        actualDate[1] = month;
+        actualDate[2] = day;
+
+
+        Agency agencia = new Agency(users, trips, buses, actualDate);
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
 
         if (!agencia.checkIfFileEmpty("users")) {
@@ -419,10 +405,29 @@ public class Agency implements Serializable, Ficheiro, Menu{
                 System.out.println(e.toString());
             }
         }
+
+        if (!agencia.checkIfFileEmpty("stats.txt")) {
+            File file = new File("stats.txt");
+            String line = agencia.readLine(file);
+            System.out.println("costa gay");
+            String[] separatedLines = line.split(",");
+            int[] stats = new int[4];
+            for (int i = 0; i < separatedLines.length; i++) {
+                stats[i] = Integer.parseInt(separatedLines[i]);
+                System.out.println(stats[i]);
+            }
+            agencia.setStats(stats);
+        } else {
+           agencia.setStats(actualDate);
+        }
+
         users.add(admin);
         agencia.setUsers(users);
         agencia.setTrips(trips);
         agencia.setBuses(buses);
         agencia.menu(agencia);
+        admin.listDayWithMostSells(agencia);
     }
+
+
 }
