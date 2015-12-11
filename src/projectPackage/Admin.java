@@ -163,7 +163,7 @@ public class Admin extends User {
         }
         choice = Integer.parseInt(strInput);
 
-        ObjectOutputStream oS = null;
+        ObjectOutputStream oS;
         switch (choice) {
             case 0:
                 System.out.print("Client's new name: ");
@@ -498,7 +498,6 @@ public class Admin extends User {
         }
         code = Integer.parseInt(strInput);
         index = indexOfTrip(trips, code);
-        ArrayList<Bus> buses = trips.get(index).getBuses();
 
         System.out.println("[0] --> All\n"      +
                            "[1] --> Code\n"     +
@@ -515,7 +514,7 @@ public class Admin extends User {
         }
         int choice = Integer.parseInt(strInput);
 
-        ObjectOutputStream oS = null;
+        ObjectOutputStream oS;
         switch (choice) {
             case 0:
                 System.out.print("Trip new code: ");
@@ -792,7 +791,7 @@ public class Admin extends User {
         }
         choice = Integer.parseInt(strInput);
 
-        ObjectOutputStream oS = null;
+        ObjectOutputStream oS;
         switch (choice) {
             case 0:
                 System.out.print("Bus new license plate: ");

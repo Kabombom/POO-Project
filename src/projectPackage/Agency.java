@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
+//TODO ber o bestRatingOfTrips por causa dos ficheiros
 //como notificar waiting list?
 //verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
 //TODO segurança do autocarro a criar viagem para nao haver conflito de datas
@@ -160,18 +161,19 @@ public class Agency implements Serializable, Ficheiro, Menu{
         while (true) {
             System.out.print("WELCOME TO THE ADMIN MENU\n" +
                     "[0] --> Exit\t\t\t" +
-                    "[1] --> Create Client\n" +
-                    "[2] --> Modify Client\t" +
-                    "[3] --> Delete Client\n" +
-                    "[4] --> List Clients\t" +
-                    "[5] --> Create Trip\n" +
-                    "[6] --> Modify Trip\t\t" +
-                    "[7] --> Delete Trip\n" +
-                    "[8] --> List Trips\t\t" +
-                    "[9] --> Create Bus\n" +
-                    "[10] --> Modify Bus\t\t" +
-                    "[11] --> Delete Bus\n" +
+                    "[1] --> Create Client\n"   +
+                    "[2] --> Modify Client\t"   +
+                    "[3] --> Delete Client\n"   +
+                    "[4] --> List Clients\t"    +
+                    "[5] --> Create Trip\n"     +
+                    "[6] --> Modify Trip\t\t"   +
+                    "[7] --> Delete Trip\n"     +
+                    "[8] --> List Trips\t\t"    +
+                    "[9] --> Create Bus\n"      +
+                    "[10] --> Modify Bus\t\t"   +
+                    "[11] --> Delete Bus\n"     +
                     "[12] --> List Buses\t\t" +
+                    "[13] --> Extras\n"   +
                     "What do you wish to do: ");
             strInput = input.nextLine();
             while (!optionsSecurity(strInput)) {
@@ -180,9 +182,9 @@ public class Agency implements Serializable, Ficheiro, Menu{
             }
             choice = Integer.parseInt(strInput);
 
-            ObjectOutputStream oSU = null;
-            ObjectOutputStream oST = null;
-            ObjectOutputStream oSB = null;
+            ObjectOutputStream oSU;
+            ObjectOutputStream oST;
+            ObjectOutputStream oSB;
             switch (choice) {
                 case 0:
                     oSU = new ObjectOutputStream(new FileOutputStream("users"));
@@ -258,6 +260,52 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     admin.listBuses(agency);
                     System.out.println();
                     break;
+                case 13:
+                    System.out.print("[0] --> Go back\t\t\t\t\t\t"                      +
+                                       "[1] --> Client that most trips bought\n"        +
+                                       "[2] --> Trip most sold in month\t\t"            +
+                                       "[3] --> Trips not sold in a month\n"            +
+                                       "[4] --> List reserves of trip\t\t"              +
+                                       "[5] --> List canceled reserves of trip\n"       +
+                                       "[6] --> Trip with best rating\t\t"              +
+                                       "[7] --> List waiting lists of trips\n"          +
+                                       "\t\t[8] --> List day with most trips sold\n"    +
+                                       "What do you wish to do: ");
+                    strInput = input.nextLine();
+                    while (!optionsSecurity(strInput)) {
+                        System.out.print("Invalid input, What do you wish to do:");
+                        strInput = input.nextLine();
+                    }
+                    choice = Integer.parseInt(strInput);
+                    switch (choice) {
+                        case 0:
+                            return;
+                        case 1:
+                            admin.clientMostTripsBoughtInMonth(agency);
+                            break;
+                        case 2:
+                            admin.mostSoldTripInMonth(agency);
+                        case 3:
+                            admin.tripsNotSoldInMonth(agency);
+                            break;
+                        case 4:
+                            admin.listTripReserves(agency);
+                            break;
+                        case 5:
+                            admin.listTripCanceledReserves(agency);
+                            break;
+                        case 6:
+                            admin.bestRatingOfTrips(agency);
+                            break;
+                        case 7:
+                            admin.listWaitingClients(agency);
+                            break;
+                        case 8:
+                            admin.listDayWithMostSells(agency);
+                            break;
+                        default:
+                            System.out.println("Invalid input");
+                    }
                 default:
                     System.out.println("Invalid operation");
                 }
@@ -268,7 +316,6 @@ public class Agency implements Serializable, Ficheiro, Menu{
         String strInput;
         int choice;
 
-        double profitToAdd = this.getProfit();
         Scanner input = new Scanner(System.in);
         while (true) {
             System.out.print("WELCOME TO THE CLIENT MENU\n" +
