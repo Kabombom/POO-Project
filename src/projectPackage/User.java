@@ -76,6 +76,28 @@ public class User implements Serializable{
         }
     }
 
+    public boolean phoneAndNifSecurity(String strInput) {
+        try {
+            int phoneNumber = Integer.parseInt(strInput);
+            return !(strInput.length() < 9);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public boolean emailSecurity(String strInput) {
+        try {
+            int counter = 0;
+            for (int i = 0; i < strInput.length(); i++) {
+                if (strInput.charAt(i) == '@' || strInput.charAt(i) == '.')
+                    counter += 1;
+            }
+            return !(counter != 2);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public boolean typeSecurity(String strInput) {
         try {
             int input = Integer.parseInt(strInput);
@@ -98,6 +120,14 @@ public class User implements Serializable{
         try {
             int code = Integer.parseInt(strInput);
             return !(code <= 0 || !checkIfTripCodeExists(trips, code));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public boolean tripDestinySecurity(String strInput, String origin) {
+        try {
+            return !strInput.equals(origin);
         } catch (NumberFormatException e) {
             return false;
         }
@@ -207,6 +237,18 @@ public class User implements Serializable{
         }
     }
 
+    public boolean tripCreationDateSecurity(Calendar calendar, Date date) {
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+        int tripYear = date.getYear();
+        int tripMonth = date.getMonth();
+        int yearDiff = tripYear - currentYear;
+        if (yearDiff > 1)
+            return false;
+        int monthDiff = tripMonth - currentMonth;
+        return yearDiff == 1 && monthDiff < 0;
+    }
+
     public boolean checkIfNifExists(ArrayList<User> users, String nif) {
         for (User user : users) {
             if (user.getNif().equals(nif))
@@ -248,19 +290,7 @@ public class User implements Serializable{
         return false;
     }
 
-    public boolean checkIfBusHasTrip(ArrayList<Trip> trips, ArrayList<Bus> buses, Bus bus, Date date) {
-        for (Trip trip : trips) {
-            ArrayList<Bus> tripBuses = trip.getBuses();
-            for (Bus tripBus : tripBuses) {
-                if (tripBus == bus) {
-                    Date tripDate = trip.getDate();
-                }
-            }
-        }
-        return false;
-    }
-
-    public int indexOfClient(ArrayList<User> users, String nif) {
+    public int indexOfUser(ArrayList<User> users, String nif) {
         int i;
         for (i = 0; i < users.size(); i++) {
             if (users.get(i).getNif().equals(nif))
@@ -289,18 +319,13 @@ public class User implements Serializable{
 
     public int compareWithCurrentDate(Calendar calendar, Date date) {
         int currentYear = calendar.get(Calendar.YEAR);
-        //Months of class calendar are indexed array like
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
         int tripYear = date.getYear();
         int tripMonth = date.getMonth();
         int tripDay = date.getDay();
-
         int currentDate = currentYear * 10000 + currentMonth *  100 + currentDay;
         int tripDate = tripYear * 10000 + tripMonth *  100 + tripDay;
-
         return tripDate - currentDate;
     }
-
-
 }

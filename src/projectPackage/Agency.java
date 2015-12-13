@@ -5,13 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
-//TODO ber o bestRatingOfTrips por causa dos ficheiros
-//como notificar waiting list?
-//verificar os autocarros ocupados como é quando acabar viagem. Meter seguranças de naquela data o autocarro estar ocupado por aquela viagem para o metodo criar trip do admin?
-//TODO segurança do autocarro a criar viagem para nao haver conflito de datas
-//TODO começar a implementar ficheiros
-//TODO javadocs
-//TODO relatorio
+//nao deixar eliminar o que la esta nem adicionar buses se nao existem buses
 
 public class Agency implements Serializable, Ficheiro, Menu{
     private ArrayList<User> users = new ArrayList<>();
@@ -112,7 +106,6 @@ public class Agency implements Serializable, Ficheiro, Menu{
 
     public User login(Agency agency) {
         ArrayList<User> users = agency.getUsers();
-
         Scanner input = new Scanner(System.in);
 
         System.out.println("Welcome to COSTA & MACHADO travel agency");
@@ -159,21 +152,21 @@ public class Agency implements Serializable, Ficheiro, Menu{
         int choice;
         Scanner input = new Scanner(System.in);
         while (true) {
-            System.out.print("WELCOME TO THE ADMIN MENU\n" +
-                    "[0] --> Exit\t\t\t" +
-                    "[1] --> Create Client\n"   +
-                    "[2] --> Modify Client\t"   +
-                    "[3] --> Delete Client\n"   +
-                    "[4] --> List Clients\t"    +
-                    "[5] --> Create Trip\n"     +
-                    "[6] --> Modify Trip\t\t"   +
-                    "[7] --> Delete Trip\n"     +
-                    "[8] --> List Trips\t\t"    +
-                    "[9] --> Create Bus\n"      +
-                    "[10] --> Modify Bus\t\t"   +
-                    "[11] --> Delete Bus\n"     +
-                    "[12] --> List Buses\t\t" +
-                    "[13] --> Extras\n"   +
+            System.out.print("WELCOME TO THE ADMIN MENU\n"      +
+                    "[0] --> Exit\t\t\t"                        +
+                    "[1] --> Create Client\n"                   +
+                    "[2] --> Modify Client\t"                   +
+                    "[3] --> Delete Client\n"                   +
+                    "[4] --> List Clients\t"                    +
+                    "[5] --> Create Trip\n"                     +
+                    "[6] --> Modify Trip\t\t"                   +
+                    "[7] --> Delete Trip\n"                     +
+                    "[8] --> List Trips\t\t"                    +
+                    "[9] --> Create Bus\n"                      +
+                    "[10] --> Modify Bus\t\t"                   +
+                    "[11] --> Delete Bus\n"                     +
+                    "[12] --> List Buses\t\t"                   +
+                    "[13] --> Extras\n"                         +
                     "What do you wish to do: ");
             strInput = input.nextLine();
             while (!optionsSecurity(strInput)) {
@@ -315,18 +308,20 @@ public class Agency implements Serializable, Ficheiro, Menu{
     public void clientMenu(Agency agency, Client client) throws IOException, ClassNotFoundException {
         String strInput;
         int choice;
-
         Scanner input = new Scanner(System.in);
+
         while (true) {
-            System.out.print("WELCOME TO THE CLIENT MENU\n" +
-                    "[0] --> Exit\t\t\t\t\t\t\t\t\t" +
-                    "[1] --> List Avaiable Trips\n" +
-                    "[2] --> Reserve Trip\t\t\t\t\t\t\t" +
-                    "[3] --> Cancel Reserve\n" +
-                    "[4] --> List Your Reserves\t\t\t\t\t\t" +
-                    "[5] --> Rate and/or comment trip\n" +
-                    "[6] --> Reserve trip and leave waiting list\n" +
+            System.out.print("WELCOME TO THE CLIENT MENU\n"             +
+                    "[0] --> Exit\t\t\t\t\t\t\t\t\t"                    +
+                    "[1] --> List Avaiable Trips\n"                     +
+                    "[2] --> Reserve Trip\t\t\t\t\t\t\t"                +
+                    "[3] --> Cancel Reserve\n"                          +
+                    "[4] --> List Your Reserves\t\t\t\t\t\t"            +
+                    "[5] --> Rate and/or comment trip\n"                +
+                    "[6] --> List trip comments\t\t\t\t\t"              +
+                    "[7] --> Reserve trip and leave waiting list\n"     +
                     "What do you wish to do: ");
+
             strInput = input.nextLine();
             while (!optionsSecurity(strInput)) {
                 System.out.print("Invalid input, What do you wish to do:");
@@ -369,6 +364,9 @@ public class Agency implements Serializable, Ficheiro, Menu{
                     System.out.println();
                     break;
                 case 6:
+                    client.listCommentsTrip(agency);
+                    break;
+                case 7:
                     client.leaveWaitingList(agency);
                     System.out.println();
                     break;
@@ -425,13 +423,14 @@ public class Agency implements Serializable, Ficheiro, Menu{
         Agency agencia = new Agency(users, trips, buses, actualDate);
         Admin admin = new Admin("Machado", "1", "1", "mail", "32434", "isto", 1);
 
+
         if (!agencia.checkIfFileEmpty("users")) {
             ObjectInputStream iS = new ObjectInputStream(new FileInputStream("users"));
             try {
                 users = (ArrayList<User>) agencia.rObject(iS);
                 iS.close();
             } catch (EOFException e) {
-                System.out.println(e.toString());
+                e.printStackTrace();
             }
         }
         if (!agencia.checkIfFileEmpty("trips")) {
@@ -449,20 +448,17 @@ public class Agency implements Serializable, Ficheiro, Menu{
                 buses = (ArrayList<Bus>) agencia.rObject(iS);
                 iS.close();
             } catch (EOFException e) {
-                System.out.println(e.toString());
+                e.printStackTrace();
             }
         }
 
         if (!agencia.checkIfFileEmpty("stats.txt")) {
             File file = new File("stats.txt");
             String line = agencia.readLine(file);
-            System.out.println("costa gay");
             String[] separatedLines = line.split(",");
             int[] stats = new int[4];
-            for (int i = 0; i < separatedLines.length; i++) {
+            for (int i = 0; i < separatedLines.length; i++)
                 stats[i] = Integer.parseInt(separatedLines[i]);
-                System.out.println(stats[i]);
-            }
             agencia.setStats(stats);
         } else {
            agencia.setStats(actualDate);

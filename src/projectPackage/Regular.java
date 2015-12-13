@@ -32,9 +32,12 @@ public class Regular extends Client{
         ArrayList<Trip> trips = agency.getTrips();
         Scanner input = new Scanner(System.in);
         String strInput;
-        int tripCode, choice;
+        int tripCode, choice, index;
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
+        Trip trip;
+        Bus firstBus;
+        Reserve reserve;
 
         listAvaiableTrips(agency);
         System.out.print("Code of trip to reserve: ");
@@ -44,90 +47,92 @@ public class Regular extends Client{
             strInput = input.nextLine();
         }
         tripCode = Integer.parseInt(strInput);
+        index = indexOfTrip(trips, tripCode);
 
+        trip = trips.get(index);
 
-        for (Trip trip: trips) {
-            if (trip.getCode() == tripCode) {
-                if (checkIfTripFull(trip.getBuses().get(0))) {
-                    System.out.print("The trip you want to reserve is full\n"   +
-                            "[0] --> Leave\t\t"                        +
-                            "[1] --> Be put on a waiting list\n"       +
-                            "What do you wish to do: ");
-                    strInput = input.nextLine();
-                    while (!optionsSecurity(strInput)) {
-                        System.out.print("Invalid input, do you want to be put on waiting list: ");
-                        strInput = input.nextLine();
-                    }
-                    choice = Integer.parseInt(strInput);
-
-                    switch (choice) {
-                        case 0:
-                            return;
-                        case 1:
-                            trip.getWaitingList().add(this);
-                            System.out.print("Operation Sucefull");
-                            return;
-                        default:
-                            System.out.println("Invalid operation");
-                    }
-                }
-
-                Bus firstBus = trip.getBuses().get(0);
-                System.out.println("Seats avaiable in the bus: ");
-                boolean[] takenSeats = firstBus.getTakenSeats();
-                for (int i = 0; i < takenSeats.length; i++) {
-                    if (!takenSeats[i])
-                        System.out.println("Seat number: " + (i + 1));
-                }
-
-                System.out.print("Seat in the bus to reserve: ");
+        if (checkIfTripFull(trip.getBuses().get(0))) {
+            System.out.print("The trip you want to reserve is full\n"   +
+                             "[0] --> Leave\t\t"                        +
+                             "[1] --> Be put on a waiting list\n"       +
+                             "What do you wish to do: ");
+            strInput = input.nextLine();
+            while (!optionsSecurity(strInput)) {
+                System.out.print("Invalid input, do you want to be put on waiting list: ");
                 strInput = input.nextLine();
-                while(!seatReserveSecurity(firstBus, strInput)) {
-                    System.out.print("Invalid input, seat number in the bus to reserve: ");
-                    strInput = input.nextLine();
-                }
-                int seatNumber = Integer.parseInt(strInput) - 1;
+            }
+            choice = Integer.parseInt(strInput);
 
-                for (Bus bus : trip.getBuses())
-                    bus.addTakenSeat(seatNumber);
-
-                agency.getCurrentDaySells()[3]++;
-                if (agency.getCurrentDaySells()[3] > agency.getStats()[3]) {
-                    agency.setStats(agency.getCurrentDaySells());
-                    String year = Integer.toString(agency.getCurrentDaySells()[0]);
-                    String month = Integer.toString(agency.getCurrentDaySells()[1]);
-                    String day = Integer.toString(agency.getCurrentDaySells()[2]);
-                    String sells = Integer.toString(agency.getCurrentDaySells()[3]);
-                    String line = year + "," + month + "," + day + "," +  sells;
-                    File file = new File("stats.txt");
-                    agency.writeOneLine(file, line);
-                } else {
-                    String year = Integer.toString(agency.getCurrentDaySells()[0]);
-                    String month = Integer.toString(agency.getCurrentDaySells()[1]);
-                    String day = Integer.toString(agency.getCurrentDaySells()[2]);
-                    String sells = Integer.toString(agency.getCurrentDaySells()[3]);
-                    String line = year + "," + month + "," + day + "," +  sells;
-                    File file = new File("stats.txt");
-                    agency.writeOneLine(file, line);
-                }
-
-                trip.getSalesByMonth()[currentMonth]++;
-                this.getTripsBoughtByMonth()[currentMonth]++;
-
-                Reserve reserve = new Reserve(this, trip, seatNumber);
-                this.clientReserves.add(reserve);
-                trip.getReservesOfTrip().add(reserve);
-                double profit = agency.getProfit() + payment(trip);
-                agency.setProfit(profit);
-                ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
-                ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
-                agency.wObject(oST, agency.getTrips());
-                oST.close();
-                agency.wObject(oSU, agency.getUsers());
-                oSU.close();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    trip.getWaitingList().add(this);
+                    System.out.print("Operation Sucefull");
+                    return;
+                default:
+                    System.out.println("Invalid operation");
             }
         }
+
+        firstBus = trip.getBuses().get(0);
+        System.out.println("Seats avaiable in the bus: ");
+        boolean[] takenSeats = firstBus.getTakenSeats();
+        for (int i = 0; i < takenSeats.length; i++) {
+            if (!takenSeats[i])
+                System.out.println("Seat number: " + (i + 1));
+        }
+
+        firstBus = trip.getBuses().get(0);
+        System.out.print("Seat in the bus to reserve: ");
+        strInput = input.nextLine();
+        while(!seatReserveSecurity(firstBus, strInput)) {
+            System.out.print("Invalid input, seat number in the bus to reserve: ");
+            strInput = input.nextLine();
+        }
+        int seatNumber = Integer.parseInt(strInput) - 1;
+
+        for (Bus bus : trip.getBuses())
+            bus.addTakenSeat(seatNumber);
+
+        agency.getCurrentDaySells()[3]++;
+        if (agency.getCurrentDaySells()[3] > agency.getStats()[3]) {
+            agency.setStats(agency.getCurrentDaySells());
+            String year = Integer.toString(agency.getCurrentDaySells()[0]);
+            String month = Integer.toString(agency.getCurrentDaySells()[1]);
+            String day = Integer.toString(agency.getCurrentDaySells()[2]);
+            String sells = Integer.toString(agency.getCurrentDaySells()[3]);
+            String line = year + "," + month + "," + day + "," +  sells;
+            File file = new File("stats.txt");
+            agency.writeOneLine(file, line);
+        } else {
+            String year = Integer.toString(agency.getCurrentDaySells()[0]);
+            String month = Integer.toString(agency.getCurrentDaySells()[1]);
+            String day = Integer.toString(agency.getCurrentDaySells()[2]);
+            String sells = Integer.toString(agency.getCurrentDaySells()[3]);
+            String line = year + "," + month + "," + day + "," +  sells;
+            File file = new File("stats.txt");
+            agency.writeOneLine(file, line);
+        }
+
+        trip.getSalesByMonth()[currentMonth]++;
+        this.getTripsBoughtByMonth()[currentMonth]++;
+
+        reserve = new Reserve(this, trip, seatNumber);
+        this.clientReserves.add(reserve);
+        trip.getReservesOfTrip().add(reserve);
+
+        double profit = agency.getProfit() + payment(trip);
+        agency.setProfit(profit);
+
+        ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
+        ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
+        agency.wObject(oST, agency.getTrips());
+        oST.close();
+        agency.wObject(oSU, agency.getUsers());
+        oSU.close();
     }
+
 
     public void listReserves() {
         for (Reserve reserve : this.getClientReserves())
@@ -155,7 +160,6 @@ public class Regular extends Client{
     public void cancelReserve(Agency agency) throws IOException {
         int code, tripCode, differenceOfDates;
         double profit = agency.getProfit();
-        //Getting current date
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
         String strInput;
@@ -186,8 +190,10 @@ public class Regular extends Client{
                 if (differenceOfDates > 7)
                     profit -= payment(trip) * 0.5;
 
-                if (checkIfTripFull(firstBus))
-                        reserve.getTrip().notifyWaitingList();
+                if(checkIfTripFull(firstBus)) {
+                    for (Client client : trip.getWaitingList())
+                        client.notifyWaitingList();
+                }
 
                 agency.getCurrentDaySells()[3]--;
                 trip.getSalesByMonth()[currentMonth]--;
@@ -201,9 +207,9 @@ public class Regular extends Client{
 
                 firstBus.deleteTakenSeat(reserve.getSeatNumber());
                 reserves.remove(i);
-                System.out.println("Operation Successful");
-                System.out.println(profit);
                 agency.setProfit(profit);
+                System.out.println("Operation Successful");
+
                 ObjectOutputStream oSU = new ObjectOutputStream(new FileOutputStream("users"));
                 ObjectOutputStream oST = new ObjectOutputStream(new FileOutputStream("trips"));
                 agency.wObject(oST, agency.getTrips());
@@ -281,10 +287,10 @@ public class Regular extends Client{
         ArrayList<Trip> trips = agency.getTrips();
 
         for (Trip trip : trips) {
-            ArrayList<User> waitingList = trip.getWaitingList();
+            ArrayList<Client> waitingList = trip.getWaitingList();
 
             for (int i = 0; i < waitingList.size(); i++) {
-                Client toCompare = (Client) waitingList.get(i);
+                Client toCompare = waitingList.get(i);
                 if (toCompare == this) {
                     waitingList.remove(i);
                     trip.setWaitingList(waitingList);
@@ -296,5 +302,10 @@ public class Regular extends Client{
 
     public double payment(Trip trip) {
         return trip.getPrice();
+    }
+
+    public void notifyWaitingList() {
+        System.out.println("A client just canceled a reservation, " +
+                "to leave the waiting list, proceed to reservation");
     }
 }

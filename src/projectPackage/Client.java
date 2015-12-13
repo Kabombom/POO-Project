@@ -30,5 +30,6 @@ public abstract class Client extends User{
     public abstract void listCommentsTrip(Agency agency);
     public abstract void leaveWaitingList(Agency agency) throws IOException;
     public abstract double payment(Trip trip);
+    public abstract void notifyWaitingList();
 
 }

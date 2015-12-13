@@ -2,6 +2,7 @@ package projectPackage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 
 public class Admin extends User {
@@ -21,9 +22,8 @@ public class Admin extends User {
 
         System.out.print("Client NIF: ");
         nif = input.nextLine();
-
-        while (checkIfNifExists(users, nif)) {
-            System.out.print("NIF already exists, client nif: ");
+        while (checkIfNifExists(users, nif) || !phoneAndNifSecurity(nif)) {
+            System.out.print("NIF invalid, client nif: ");
             nif = input.nextLine();
         }
 
@@ -32,13 +32,17 @@ public class Admin extends User {
 
         System.out.print("Client email: ");
         email = input.nextLine();
-        while (checkIfEmailExists(users, email)) {
-            System.out.print("Email already exists, client email: ");
+        while (checkIfEmailExists(users, email) || !emailSecurity(email)) {
+            System.out.print("Invalid email, client email: ");
             email = input.nextLine();
         }
 
         System.out.print("Client phone number:");
         phone = input.nextLine();
+        while (!phoneAndNifSecurity(phone)) {
+            System.out.println("Invalid input, phone number: ");
+            phone = input.nextLine();
+        }
 
         System.out.print("Client password: ");
         password = input.nextLine();
@@ -92,16 +96,22 @@ public class Admin extends User {
 
         System.out.print("NIF of user to delete: ");
         nif = input.nextLine();
-        while (!checkIfNifExists(users, nif)) {
-            System.out.println("NIF  doesn't exist, NIF of user to delete:");
+        while (checkIfNifExists(users, nif) || !phoneAndNifSecurity(nif)) {
+            System.out.print("NIF invalid, client nif: ");
+            nif = input.nextLine();
         }
 
-        index = indexOfClient(users, nif);
+        index = indexOfUser(users, nif);
         User user = users.get(index);
 
-        ObjectOutputStream oS = new ObjectOutputStream(new FileOutputStream("users"));
+        ObjectOutputStream oS;
         if (user.getType() == 2 || user.getType() == 3) {
+
             Client client = (Client) users.get(index);
+            if (client.getClientReserves().size() > 0) {
+                System.out.println("Client has active reserves of trips");
+                return;
+            }
 
             for (Reserve clientReserve : client.getClientReserves()) {
                 Trip tripOfReserve = clientReserve.getTrip();
@@ -120,13 +130,19 @@ public class Admin extends User {
             }
             users.remove(index);
             agency.setUsers(users);
+
+            oS = new ObjectOutputStream(new FileOutputStream("users"));
             agency.wObject(oS, users);
+            oS.close();
             System.out.println("Client sucefully removed");
         }
         else {
             users.remove(index);
             agency.setUsers(users);
+
+            oS = new ObjectOutputStream(new FileOutputStream("users"));
             agency.wObject(oS, users);
+            oS.close();
             System.out.println("Client sucefully removed");
         }
         oS.close();
@@ -145,7 +161,7 @@ public class Admin extends User {
             System.out.print("Invalid Input, NIF of client you want to  modify: ");
             strInput = input.nextLine();
         }
-        index = indexOfClient(users, strInput);
+        index = indexOfUser(users, strInput);
 
         System.out.print("[0] --> All\n"            +
                          "[1] --> Name\n"           +
@@ -171,8 +187,8 @@ public class Admin extends User {
 
                 System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
-                while (checkIfNifExists(users, nif)) {
-                    System.out.print("Invalid input, NIF of client you want to  modify: ");
+                while (checkIfNifExists(users, nif) || !phoneAndNifSecurity(nif)) {
+                    System.out.print("NIF invalid, client nif: ");
                     nif = input.nextLine();
                 }
 
@@ -181,13 +197,17 @@ public class Admin extends User {
 
                 System.out.print("Client's new email: ");
                 email = input.nextLine();
-                while (checkIfEmailExists(users, email)) {
-                    System.out.println("Email already exists, client email: ");
+                while (checkIfEmailExists(users, email) || !emailSecurity(email)) {
+                    System.out.print("Invalid email, client email: ");
                     email = input.nextLine();
                 }
 
                 System.out.print("Client's new phone number:");
                 phone = input.nextLine();
+                while (!phoneAndNifSecurity(phone)) {
+                    System.out.print("Invalid input, phone number: ");
+                    phone = input.nextLine();
+                }
 
                 System.out.print("Client's new password: ");
                 password = input.nextLine();
@@ -223,8 +243,8 @@ public class Admin extends User {
             case 2:
                 System.out.print("Client's new NIF: ");
                 nif = input.nextLine();
-                while (checkIfNifExists(users, nif)) {
-                    System.out.print("Invalid input, NIF of client you want to  modify: ");
+                while (checkIfNifExists(users, nif) || !phoneAndNifSecurity(nif)) {
+                    System.out.print("NIF invalid, client nif: ");
                     nif = input.nextLine();
                 }
                 users.get(index).setNif(nif);
@@ -245,8 +265,8 @@ public class Admin extends User {
             case 4:
                 System.out.print("Client's new email: ");
                 email = input.nextLine();
-                while (checkIfEmailExists(users, email)) {
-                    System.out.println("Email already exists, client email: ");
+                while (checkIfEmailExists(users, email) || !emailSecurity(email)) {
+                    System.out.print("Invalid email, client email: ");
                     email = input.nextLine();
                 }
                 users.get(index).setEmail(email);
@@ -258,6 +278,10 @@ public class Admin extends User {
             case 5:
                 System.out.print("Client's new phone number:");
                 phone = input.nextLine();
+                while (!phoneAndNifSecurity(phone)) {
+                    System.out.print("Invalid input, phone number: ");
+                    phone = input.nextLine();
+                }
                 users.get(index).setPhone(phone);
                 agency.setUsers(users);
                 oS = new ObjectOutputStream(new FileOutputStream("users"));
@@ -312,46 +336,12 @@ public class Admin extends User {
         }
     }
 
-    public void createTrip(Agency agency) throws IOException {
-        ArrayList<Trip> trips = agency.getTrips();
-        ArrayList<Bus> buses = agency.getBuses();
-
+    public Date createDate() {
         int code, year, month, day, hour, minute, numBuses;
-        double price, duration;
         Scanner input = new Scanner(System.in);
         String strInput;
 
-        System.out.print("Trip code: ");
-        strInput = input.nextLine();
-        while (!createTripCodeSecurity(trips ,strInput)) {
-            System.out.print("Invalid input, trip code: ");
-            strInput = input.nextLine();
-        }
-        code = Integer.parseInt(strInput);
-
-        System.out.print("Trip origin: ");
-        String origin = input.nextLine();
-
-        System.out.print("Trip destiny: ");
-        String destiny = input.nextLine();
-
-        System.out.print("Trip price: ");
-        strInput = input.nextLine();
-        while (!tripPriceSecurity(strInput)) {
-            System.out.print("Invalid input, trip price: ");
-            strInput = input.nextLine();
-        }
-        price = Double.parseDouble(strInput);
-
-        System.out.print("Trip duration: ");
-        strInput = input.nextLine();
-        while (!tripPriceSecurity(strInput)) {
-            System.out.print("Invalid input, trip duration: ");
-            strInput = input.nextLine();
-        }
-        duration = Double.parseDouble(strInput);
-
-        System.out.print("Trip new year: ");
+        System.out.print("Trip  year: ");
         strInput = input.nextLine();
         while (!dateYearSecurity(strInput)) {
             System.out.print("Invalid input, trip year: ");
@@ -359,7 +349,7 @@ public class Admin extends User {
         }
         year = Integer.parseInt(strInput);
 
-        System.out.print("Trip new month: ");
+        System.out.print("Trip  month: ");
         strInput = input.nextLine();
         while (!dateMonthSecurity(strInput, year)) {
             System.out.print("Invalid input, trip month: ");
@@ -390,8 +380,59 @@ public class Admin extends User {
             strInput = input.nextLine();
         }
         minute = Integer.parseInt(strInput);
+        return new Date(minute, hour, day, month, year);
+    }
 
-        Date date = new Date(minute, hour, day, month, year);
+    public void createTrip(Agency agency) throws IOException {
+        ArrayList<Trip> trips = agency.getTrips();
+        ArrayList<Bus> buses = agency.getBuses();
+
+        int code, numBuses;
+        double price, duration;
+        Scanner input = new Scanner(System.in);
+        String strInput;
+
+        System.out.print("Trip code: ");
+        strInput = input.nextLine();
+        while (!createTripCodeSecurity(trips ,strInput)) {
+            System.out.print("Invalid input, trip code: ");
+            strInput = input.nextLine();
+        }
+        code = Integer.parseInt(strInput);
+
+        System.out.print("Trip origin: ");
+        String origin = input.nextLine();
+
+        System.out.print("Trip destiny: ");
+        String destiny = input.nextLine();
+        while(!tripDestinySecurity(destiny, origin)) {
+            System.out.print("Destination can't be the same as origin, trip destiny:");
+            destiny = input.nextLine();
+        }
+
+        System.out.print("Trip price: ");
+        strInput = input.nextLine();
+        while (!tripPriceSecurity(strInput)) {
+            System.out.print("Invalid input, trip price: ");
+            strInput = input.nextLine();
+        }
+        price = Double.parseDouble(strInput);
+
+        System.out.print("Trip duration: ");
+        strInput = input.nextLine();
+        while (!tripPriceSecurity(strInput)) {
+            System.out.print("Invalid input, trip duration: ");
+            strInput = input.nextLine();
+        }
+        duration = Double.parseDouble(strInput);
+
+        Date date = createDate();
+        Calendar calendar = Calendar.getInstance();
+        while (!tripCreationDateSecurity(calendar, date)) {
+            System.out.println("Invalid date");
+            date = createDate();
+        }
+
 
         System.out.print("Number of buses used: ");
         strInput = input.nextLine();
@@ -530,6 +571,10 @@ public class Admin extends User {
 
                 System.out.print("Trip new destiny: ");
                 destiny = input.nextLine();
+                while(!tripDestinySecurity(destiny, origin)) {
+                    System.out.print("Destination can't be the same as origin, trip destiny:");
+                    destiny = input.nextLine();
+                }
 
                 System.out.print("Trip new price: ");
                 strInput = input.nextLine();
@@ -625,6 +670,10 @@ public class Admin extends User {
             case 3:
                 System.out.print("Trip new destiny: ");
                 strInput = input.nextLine();
+                while(!tripDestinySecurity(strInput, trips.get(index).getOrigin())) {
+                    System.out.print("Destination can't be the same as origin, trip destiny:");
+                    strInput = input.nextLine();
+                }
                 trips.get(index).setDestiny(strInput);
                 agency.setTrips(trips);
                 oS = new ObjectOutputStream(new FileOutputStream("trips"));
@@ -1019,10 +1068,9 @@ public class Admin extends User {
             if (!checkIfTripFull(firstBus))
                 continue;
 
-            ArrayList<User> waitingList = trip.getWaitingList();
+            ArrayList<Client> waitingList = trip.getWaitingList();
             System.out.println("Users in waiting list for " + trip + ":");
-            for (User user : waitingList) {
-                Client client = (Client) user;
+            for (Client client : waitingList) {
                 System.out.println(client);
             }
         }
