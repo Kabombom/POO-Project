@@ -237,7 +237,7 @@ public class User implements Serializable{
         }
     }
 
-    public boolean tripCreationDateSecurity(Calendar calendar, Date date) {
+    public boolean tripDateCreationgSecurity(Calendar calendar, Date date) {
         int currentYear = calendar.get(Calendar.YEAR);
         int currentMonth = calendar.get(Calendar.MONTH) + 1;
         int tripYear = date.getYear();

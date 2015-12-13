@@ -430,7 +430,7 @@ public class Admin extends User {
 
         Date date = createDate();
         Calendar calendar = Calendar.getInstance();
-        while (!tripCreationDateSecurity(calendar, date)) {
+        while (!tripDateCreationgSecurity(calendar, date)) {
             System.out.println("Invalid date");
             date = createDate();
         }
