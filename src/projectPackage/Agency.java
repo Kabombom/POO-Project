@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
-//nao deixar eliminar o que la esta nem adicionar buses se nao existem buses
-
 public class Agency implements Serializable, Ficheiro, Menu{
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Trip> trips = new ArrayList<>();
@@ -390,14 +388,10 @@ public class Agency implements Serializable, Ficheiro, Menu{
         try {
             if (user.getType() == 2 || user.getType() == 3) {
                 client = (Client) user;
-                while (true) {
-                    clientMenu(agency, client);
-                }
+                clientMenu(agency, client);
             } else {
                 admin = (Admin) user;
-                while (true) {
-                    adminMenu(agency, admin);
-                }
+                adminMenu(agency, admin);
             }
         } catch (InterruptedIOException e) {
             System.out.println(e.getMessage());
@@ -432,6 +426,8 @@ public class Agency implements Serializable, Ficheiro, Menu{
             } catch (EOFException e) {
                 e.printStackTrace();
             }
+        } else {
+            users.add(admin);
         }
         if (!agencia.checkIfFileEmpty("trips")) {
             ObjectInputStream iS = new ObjectInputStream(new FileInputStream("trips"));
@@ -464,12 +460,10 @@ public class Agency implements Serializable, Ficheiro, Menu{
            agencia.setStats(actualDate);
         }
 
-        users.add(admin);
         agencia.setUsers(users);
         agencia.setTrips(trips);
         agencia.setBuses(buses);
         agencia.menu(agencia);
-        admin.listDayWithMostSells(agencia);
     }
 
 

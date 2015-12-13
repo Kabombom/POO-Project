@@ -89,6 +89,8 @@ public class Admin extends User {
 
     public void deleteUser(Agency agency) throws IOException {
         ArrayList<User> users = agency.getUsers();
+        if (users.size() == 0)
+            return;
         ArrayList<Trip> trips = agency.getTrips();
         int index, indexTrip;
         Scanner input = new Scanner(System.in);
@@ -337,7 +339,7 @@ public class Admin extends User {
     }
 
     public Date createDate() {
-        int code, year, month, day, hour, minute, numBuses;
+        int year, month, day, hour, minute;
         Scanner input = new Scanner(System.in);
         String strInput;
 
@@ -457,6 +459,11 @@ public class Admin extends User {
 
             switch (choice) {
                 case 1:
+                    if (buses.size() == 0) {
+                        System.out.println("There are no existing buses to add");
+                        i--;
+                        break;
+                    }
                     listBuses(agency);
                     System.out.print("License plate of the bus: ");
                     strInput = input.nextLine();
@@ -492,6 +499,8 @@ public class Admin extends User {
 
     public void deleteTrip(Agency agency) throws IOException {
         ArrayList<Trip> trips = agency.getTrips();
+        if (trips.size() == 0)
+            return;
         int code, index;
         Scanner input = new Scanner(System.in);
         String strInput;
@@ -790,7 +799,8 @@ public class Admin extends User {
         Scanner input = new Scanner(System.in);
         String licensePlate;
         ArrayList<Bus> buses = agency.getBuses();
-
+        if (buses.size() == 0)
+            return;
         listBuses(agency);
         System.out.print("License plate of bus to delete: ");
         licensePlate = input.nextLine();

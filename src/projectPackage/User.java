@@ -246,7 +246,7 @@ public class User implements Serializable{
         if (yearDiff > 1)
             return false;
         int monthDiff = tripMonth - currentMonth;
-        return yearDiff == 1 && monthDiff < 0;
+        return yearDiff <= 1 && monthDiff <= 0;
     }
 
     public boolean checkIfNifExists(ArrayList<User> users, String nif) {
